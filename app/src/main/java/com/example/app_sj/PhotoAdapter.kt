@@ -31,11 +31,13 @@ class PhotoAdapter(
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val photo = photos[position]
 
+        //加载图片
         loadImage(photo,holder.ivPhoto)
-
+        //设置点击事件
         holder.ivPhoto.setOnClickListener {
             onItemClick(photo,holder.ivPhoto)
         }
+
         Glide.with(holder.itemView.context)
             .load(photo.imagePath)
             .centerCrop()
@@ -45,6 +47,14 @@ class PhotoAdapter(
     // 返回项目数量
     override fun getItemCount(): Int = photos.size
 
+
+    //加载图片
+
+    private fun loadImage(photo: Photo,imageView: ImageView){
+        try{
+
+        }
+    }
     // 添加新图片
     fun addPhoto(newPhoto: Photo) {
         val newList = photos.toMutableList()
