@@ -1,9 +1,13 @@
 package com.example.app_sj
 
+import android.app.Dialog
 import android.os.Bundle
+import android.view.Window
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
 
 class PublicAlbumActivity : AppCompatActivity() {
@@ -43,12 +47,15 @@ class PublicAlbumActivity : AppCompatActivity() {
         val layoutManager = GridLayoutManager(this, 3)
         rvPhotos.layoutManager = layoutManager
 
-        // 创建适配器
-        photoAdapter = PhotoAdapter()
+        // 创建适配器,点击回调
+        photoAdapter = PhotoAdapter(emptyList()){
+            photo, imageView ->
+            showImageDialog(photo,imageView)
+        }
         rvPhotos.adapter = photoAdapter
 
         // 设置图片间距 - 4dp
-        val spacingInPixels = 4.dpToPx()  // 修正拼写错误
+        val spacingInPixels = 4.dpToPx()
         rvPhotos.addItemDecoration(GridSpacingItemDecoration(3, spacingInPixels, true))
     }
 
@@ -79,6 +86,54 @@ class PublicAlbumActivity : AppCompatActivity() {
         photoAdapter.updatePhotos(samplePhotos)
     }
 
+
+    //显示图片放大
+    private fun showImageDialog(photo: Photo,sourceImageView: ImageView){
+
+        //图片操作框
+        val dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_image_preview)
+
+        val ivPreview = dialog.findViewById<ImageView>(R.id.ivPreview)
+
+        //加载放大图
+        loadPreviewImage(photo,ivPreview)
+
+        //关闭放大图
+        ivPreview.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        //显示操作框
+        dialog.show()
+    }
+    private fun loadPreviewImage(photo: Photo,imageView: ImageView){
+        try{
+            if(photo.imagePath.startsWith("R.drawable.")){
+                //加载图片
+                val resourceName = photo.imagePath.substringAfter("R.drawable.")
+                val resourceId = resources.getIdentifier(
+                    resourceName,
+                    "drawable",
+                    packageName
+                )
+                if(resourceId!=0){
+                    Glide.with(this)
+                        .load(resourceId)
+                        .fitCenter()
+                        .into(imageView)
+                }
+            }else{
+                Glide.with(this)
+                    .load(photo.imagePath)
+                    .fitCenter()
+                    .into(imageView)
+            }
+        }catch(e: Exception){
+            e.printStackTrace()
+        }
+    }
     /**
      * 添加新图片到相册末尾
      * @param imagePath 新图片的本地路径

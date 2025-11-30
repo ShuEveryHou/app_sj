@@ -12,6 +12,9 @@
         android:layout_height="120dp"
         android:scaleType="centerCrop"
         android:background="#F0F0F0"
-        android:contentDescription="相册图片"/>
+        android:contentDescription="相册图片"
+        android:clickable="true"
+        android:focusable="true"
+        />
 
 </LinearLayout>

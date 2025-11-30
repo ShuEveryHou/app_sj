@@ -1,5 +1,6 @@
 package com.example.app_sj
 
+import android.net.wifi.p2p.WifiP2pManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,7 +53,31 @@ class PhotoAdapter(
 
     private fun loadImage(photo: Photo,imageView: ImageView){
         try{
-
+            if(photo.imagePath.startsWith("R.drawable.")){
+                //加载图片
+                val resourceName = photo.imagePath.substringAfter("R.drawable.")
+                val resourceId = imageView.context.resources.getIdentifier(
+                    resourceName,
+                    "drawable",
+                    imageView.context.packageName
+                )
+                if(resourceId!=0){
+                    Glide.with(imageView.context)
+                        .load(resourceId)
+                        .centerCrop()
+                        .into(imageView)
+                }else{
+                    imageView.setBackgroundColor(0xFFF0F0F.toInt())
+                }
+            }else{
+                Glide.with(imageView.context)
+                    .load(photo.imagePath)
+                    .centerCrop()
+                    .into(imageView)
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+            imageView.setBackgroundColor(0xFFF0F0F0.toInt())
         }
     }
     // 添加新图片
