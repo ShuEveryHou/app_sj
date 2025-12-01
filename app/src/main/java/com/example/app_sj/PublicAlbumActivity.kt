@@ -1,6 +1,7 @@
 package com.example.app_sj
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.Window
 import android.widget.ImageView
@@ -86,23 +87,13 @@ class PublicAlbumActivity : AppCompatActivity() {
     //显示图片放大
     private fun showImageDialog(photo: Photo,sourceImageView: ImageView){
 
-        //图片操作框
-        val dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_image_preview)
-
-        val ivPreview = dialog.findViewById<ImageView>(R.id.ivPreview)
-
-        //加载放大图
-        loadPreviewImage(photo,ivPreview)
-
-        //关闭放大图
-        dialog.window?.decorView?.setOnClickListener {
-            dialog.dismiss()
+        val intent = Intent(this, ImageDetailActivity::class.java).apply{
+            putExtra("photo_id",photo.id)
+            putExtra("image_paht",photo.imagePath)
+            putExtra("photo_title","图片${photo.id}")
         }
-
-        //显示操作框
-        dialog.show()
+        startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out)
     }
 
     //图片预加载

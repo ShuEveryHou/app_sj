@@ -24,8 +24,8 @@
         <activity android:name=".PrivateAlbumActivity" android:exported="false"/>
         <activity android:name=".GridSpacingItemDecoration" android:exported="false"/>
         <activity android:name="Photo" android:exported="false"/>
+        <activity android:name=".ImageDetailActivity" android:exported="false"/>
 
-        <!--<activity android:name=".SplashActivity"/>-->
 
     </application>
 

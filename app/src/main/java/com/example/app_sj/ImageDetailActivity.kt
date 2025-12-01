@@ -1,0 +1,94 @@
+package com.example.app_sj
+
+import android.os.Bundle
+import android.os.PersistableBundle
+import android.view.View
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
+
+class ImageDetailActivity: AppCompatActivity() {
+    private lateinit var  ivDetail: ImageView
+    private lateinit var layoutTopBar: LinearLayout
+    private lateinit var layoutBottomBar: LinearLayout
+    private lateinit var tvPhotoInfo: TextView
+    private lateinit var btnBack: ImageView
+    private lateinit var btnSend: Button
+    private lateinit var btnEdit: Button
+    private lateinit var btnDelete: Button
+    private lateinit var btnText: Button
+
+    private var isUIVisible = true//显示操作栏状态
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_image_detail)
+
+        initViews()
+        setupCLickListeners()
+        loadImageData()
+    }
+
+    private fun initViews(){
+        ivDetail = findViewById(R.id.ivDetail)
+        layoutTopBar = findViewById(R.id.layoutTopBar)
+        layoutBottomBar = findViewById(R.id.layoutBottomBar)
+        tvPhotoInfo = findViewById(R.id.tvPhotoInfo)
+        btnBack = findViewById(R.id.btnBack)
+        btnSend = findViewById(R.id.btnSend)
+        btnEdit = findViewById(R.id.btnEdit)
+        btnDelete = findViewById(R.id.btnDelete)
+        btnText = findViewById(R.id.btnText)
+    }
+
+    private fun setupCLickListeners(){
+         //返回按钮
+        btnBack.setOnClickListener {
+            finish()
+        }
+
+        //切换图片细节UI
+        ivDetail.setOnClickListener {
+            toggleUI()
+        }
+
+        //发送按钮
+        btnSend.setOnClickListener {
+
+        }
+        //编辑按钮
+        btnEdit.setOnClickListener {
+
+        }
+        //删除按钮
+        btnDelete.setOnClickListener {
+
+        }
+        //文字按钮
+        btnText.setOnClickListener {
+
+        }
+    }
+
+    private fun loadImageData(){
+
+    }
+
+    private fun toggleUI(){
+        if(isUIVisible){
+            //隐藏UI元素
+            layoutTopBar.visibility = View.GONE
+            layoutBottomBar.visibility = View.GONE
+        }else{
+            layoutTopBar.visibility = View.VISIBLE
+            layoutBottomBar.visibility = View.VISIBLE
+        }
+        isUIVisible =!isUIVisible
+    }
+
+
+}

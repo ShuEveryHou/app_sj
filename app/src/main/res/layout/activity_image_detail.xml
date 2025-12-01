@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    >
+    <!--图片显示区域-->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/ivDetail"
+        android:scaleType="fitCenter"
+        android:contentDescription="图片详情"
+        />
+    <!--顶部信息栏-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layoutTopBar"
+        android:background="#80000000"
+        android:orientation="horizontal"
+        android:padding="24dp"
+        android:visibility="visible">
+
+        <!--返回按钮-->
+        <ImageButton
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/btnBack"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_arrow_back"
+            android:contentDescription="返回相册"
+            android:tint="@android:color/white"/>
+
+        <!--照片信息-->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvPhotoInfo"
+            android:layout_weight="1"
+            android:text="PhotoInfo"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"/>
+
+    </LinearLayout>
+
+    <!--底部操作栏-->
+    <LinearLayout
+        android:id="@+id/layoutBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#80000000"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:visibility="visible">
+        <!--发送按钮-->
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="发送"
+            android:textColor="@android:color/white" />
+
+        <!--编辑按钮-->
+        <Button
+            android:id="@+id/btnEdit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="编辑"
+            android:textColor="@android:color/white" />
+
+        <!--删除按钮-->
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="删除"
+            android:textColor="@android:color/white"
+            />
+        <!--文字-->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnText"
+            android:layout_weight="1"
+            android:text="文字"
+            android:textColor="@android:color/white"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>
