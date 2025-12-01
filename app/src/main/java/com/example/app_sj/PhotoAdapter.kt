@@ -13,7 +13,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 //显示图片列表
 class PhotoAdapter(
     private var photos: List<Photo> = emptyList(),
-    private val onItemClick: (Photo, ImageView)->Unit ={ _, _ ->}
+    private val onItemClick: (Photo)->Unit ={ }
 
 ): RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>(){
 
@@ -32,17 +32,16 @@ class PhotoAdapter(
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val photo = photos[position]
 
-        //加载图片
-        loadImage(photo,holder.ivPhoto)
-        //设置点击事件
-        holder.ivPhoto.setOnClickListener {
-            onItemClick(photo,holder.ivPhoto)
-        }
-
+        //直接使用资源ID加载图片资源
         Glide.with(holder.itemView.context)
-            .load(photo.imagePath)
+            .load(photo.resourceId)
             .centerCrop()
             .into(holder.ivPhoto)
+
+        //设置点击事件
+        holder.ivPhoto.setOnClickListener {
+            onItemClick(photo)
+        }
     }
 
     // 返回项目数量
@@ -50,8 +49,7 @@ class PhotoAdapter(
 
 
     //加载图片
-
-    private fun loadImage(photo: Photo,imageView: ImageView){
+    /*private fun loadImage(photo: Photo,imageView: ImageView){
         try{
             if(photo.imagePath.startsWith("R.drawable.")){
                 //加载图片
@@ -79,7 +77,9 @@ class PhotoAdapter(
             e.printStackTrace()
             imageView.setBackgroundColor(0xFFF0F0F0.toInt())
         }
-    }
+    }*/
+
+
     // 添加新图片
     fun addPhoto(newPhoto: Photo) {
         val newList = photos.toMutableList()

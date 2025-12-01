@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
+import com.bumptech.glide.Glide
 
 class ImageDetailActivity: AppCompatActivity() {
     private lateinit var  ivDetail: ImageView
@@ -75,7 +76,27 @@ class ImageDetailActivity: AppCompatActivity() {
     }
 
     private fun loadImageData(){
+        val photoId = intent.getIntExtra("photo_id",0)
+        val resourceId = intent.getIntExtra("photo_resource_id",0)
+        val photoTitle = intent.getStringExtra("photo_title")?:"未命名图片"
 
+        tvPhotoInfo.text = "图片ID: $photoId - $photoTitle"
+
+        loadImage(resourceId)
+    }
+
+    private fun loadImage(resourceId: Int){
+        try {
+            if (resourceId != 0) {
+                // 使用Glide加载资源图片
+                Glide.with(this)
+                    .load(resourceId)
+                    .fitCenter()  // 保持比例，完整显示
+                    .into(ivDetail)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun toggleUI(){

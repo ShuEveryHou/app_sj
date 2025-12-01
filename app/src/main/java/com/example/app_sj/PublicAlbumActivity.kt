@@ -48,8 +48,8 @@ class PublicAlbumActivity : AppCompatActivity() {
 
         // 创建适配器,点击回调
         photoAdapter = PhotoAdapter(emptyList()){
-            photo, imageView ->
-            showImageDialog(photo,imageView)
+            photo ->
+            openImageDetail(photo)
         }
         rvPhotos.adapter = photoAdapter
 
@@ -58,85 +58,64 @@ class PublicAlbumActivity : AppCompatActivity() {
         rvPhotos.addItemDecoration(GridSpacingItemDecoration(3, spacingInPixels, true))
     }
 
-
     //加载图片数据
     private fun loadSamplePhotos() {  // 添加这个方法定义
-        // 模拟本地图片数据
-        val samplePhotos = listOf(
-            Photo(1,"R.drawable.bao_1"),
-            Photo(2,"R.drawable.bao_2"),
-            Photo(3,"R.drawable.bao_3"),
-            Photo(4,"R.drawable.bao_4"),
-            Photo(5,"R.drawable.bao_5"),
-            Photo(6,"R.drawable.bao_6"),
-            Photo(7,"R.drawable.bao_7"),
-            Photo(8,"R.drawable.bao_8"),
-            Photo(9,"R.drawable.bao_9"),
-            Photo(10,"R.drawable.bao_10"),
-            Photo(11,"R.drawable.bao_11"),
-            Photo(12,"R.drawable.bao_12"),
-            Photo(13,"R.drawable.bao_13"),
-            Photo(14,"R.drawable.bao_14")
+
+        val samplePhotos = mutableListOf<Photo>()
+        // 获取资源ID的函数
+        fun getResourceId(name: String): Int {
+            return resources.getIdentifier(name, "drawable", packageName)
+        }
+
+        // 本地图片数据
+        val imageData  = listOf(
+            Pair("bao_1","图1"),
+            Pair("bao_2","图2"),
+            Pair("bao_3","图3"),
+            Pair("bao_4","图4"),
+            Pair("bao_5","图5"),
+            Pair("bao_6","图6"),
+            Pair("bao_7","图7"),
+            Pair("bao_8","图8"),
+            Pair("bao_9","图9"),
+            Pair("bao_10","图10"),
+            Pair("bao_11","图11"),
+            Pair("bao_12","图12"),
+            Pair("bao_13","图13"),
+            Pair("bao_14","图14"),
+
         )
+
+        // 创建Photo对象列表
+        for ((index, data) in imageData.withIndex()) {
+            val (imageName, title) = data
+            val resourceId = getResourceId(imageName)
+
+            if (resourceId != 0) {
+                // 资源存在，添加到列表
+                samplePhotos.add(Photo(index + 1, resourceId, title))
+            } else {
+                // 资源不存在，使用默认图标
+                samplePhotos.add(Photo(index + 1, android.R.drawable.ic_menu_camera, "$title (默认)"))
+            }
+        }
 
         // 更新适配器数据
         photoAdapter.updatePhotos(samplePhotos)
     }
 
-
-    //显示图片放大
-    private fun showImageDialog(photo: Photo,sourceImageView: ImageView){
-
-        val intent = Intent(this, ImageDetailActivity::class.java).apply{
-            putExtra("photo_id",photo.id)
-            putExtra("image_paht",photo.imagePath)
-            putExtra("photo_title","图片${photo.id}")
+    private fun openImageDetail(photo: Photo) {
+        // 创建Intent跳转到详情页面
+        val intent = Intent(this, ImageDetailActivity::class.java).apply {
+            putExtra("photo_id", photo.id)
+            putExtra("photo_resource_id", photo.resourceId)
+            putExtra("photo_title", photo.title)
         }
+
+        // 启动详情页面
         startActivity(intent)
-        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out)
+
     }
-
-    //图片预加载
-    private fun loadPreviewImage(photo: Photo,imageView: ImageView){
-        try{
-            if(photo.imagePath.startsWith("R.drawable.")){
-                //加载图片
-                val resourceName = photo.imagePath.substringAfter("R.drawable.")
-                val resourceId = resources.getIdentifier(
-                    resourceName,
-                    "drawable",
-                    packageName
-                )
-                if(resourceId!=0){
-                    Glide.with(this)
-                        .load(resourceId)
-                        .fitCenter()
-                        .into(imageView)
-                }
-            }else{
-                Glide.with(this)
-                    .load(photo.imagePath)
-                    .fitCenter()
-                    .into(imageView)
-            }
-        }catch(e: Exception){
-            e.printStackTrace()
-        }
-    }
-
-    //添加新图片到相册末尾
-    fun addNewPhoto(imagePath: String) {  // 修正参数名
-        // 创建新的图片ID（当前数量 + 1）
-        val newId = photoAdapter.itemCount + 1
-        val newPhoto = Photo(newId, imagePath)  // 修正参数名
-
-        // 添加到适配器
-        photoAdapter.addPhoto(newPhoto)
-
-        // 可选：滚动到最后位置
-        rvPhotos.smoothScrollToPosition(photoAdapter.itemCount - 1)
-    }
-
 
     //返回主界面
     private fun returnToMainActivity() {
@@ -147,9 +126,8 @@ class PublicAlbumActivity : AppCompatActivity() {
         returnToMainActivity()
     }
 
-    /**
-     * 扩展函数：dp转px
-     */
+
+    //扩展函数：dp转px
     private fun Int.dpToPx(): Int {
         return (this * resources.displayMetrics.density).toInt()
     }
