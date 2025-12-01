@@ -23,7 +23,7 @@ class ImageDetailActivity: AppCompatActivity() {
     private lateinit var btnDelete: Button
     private lateinit var btnText: Button
 
-    private var isUIVisible = true//显示操作栏状态
+    private var isUIVisible = false//显示操作栏状态
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
