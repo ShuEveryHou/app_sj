@@ -9,7 +9,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
 import com.bumptech.glide.Glide
 
 class ImageDetailActivity: AppCompatActivity() {
