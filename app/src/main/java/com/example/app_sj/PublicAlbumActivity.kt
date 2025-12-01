@@ -24,9 +24,8 @@ class PublicAlbumActivity : AppCompatActivity() {
         loadSamplePhotos()  // 加载示例图片
     }
 
-    /**
-     * 设置顶部工具栏
-     */
+
+    // 设置顶部工具栏
     private fun setupToolbar() {
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -37,9 +36,8 @@ class PublicAlbumActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 设置RecyclerView和图片网格
-     */
+
+    //设置RecyclerView和图片网格
     private fun setupRecyclerView() {
         rvPhotos = findViewById(R.id.rvPhotos)
 
@@ -59,10 +57,8 @@ class PublicAlbumActivity : AppCompatActivity() {
         rvPhotos.addItemDecoration(GridSpacingItemDecoration(3, spacingInPixels, true))
     }
 
-    /**
-     * 加载示例图片数据
-     * 这里使用模拟数据，实际使用时替换为真实的本地图片路径
-     */
+
+    //加载图片数据
     private fun loadSamplePhotos() {  // 添加这个方法定义
         // 模拟本地图片数据
         val samplePhotos = listOf(
@@ -101,13 +97,15 @@ class PublicAlbumActivity : AppCompatActivity() {
         loadPreviewImage(photo,ivPreview)
 
         //关闭放大图
-        ivPreview.setOnClickListener {
+        dialog.window?.decorView?.setOnClickListener {
             dialog.dismiss()
         }
 
         //显示操作框
         dialog.show()
     }
+
+    //图片预加载
     private fun loadPreviewImage(photo: Photo,imageView: ImageView){
         try{
             if(photo.imagePath.startsWith("R.drawable.")){
@@ -134,10 +132,8 @@ class PublicAlbumActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
-    /**
-     * 添加新图片到相册末尾
-     * @param imagePath 新图片的本地路径
-     */
+
+    //添加新图片到相册末尾
     fun addNewPhoto(imagePath: String) {  // 修正参数名
         // 创建新的图片ID（当前数量 + 1）
         val newId = photoAdapter.itemCount + 1
@@ -150,14 +146,13 @@ class PublicAlbumActivity : AppCompatActivity() {
         rvPhotos.smoothScrollToPosition(photoAdapter.itemCount - 1)
     }
 
-    /**
-     * 返回主界面
-     */
+
+    //返回主界面
     private fun returnToMainActivity() {
         finish()
     }
 
-    override fun onBackPressed() {
+    fun onBackPressedDispatcher() {
         returnToMainActivity()
     }
 
