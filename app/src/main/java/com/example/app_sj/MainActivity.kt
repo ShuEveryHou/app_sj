@@ -2,20 +2,14 @@ package com.example.app_sj
 
 import android.os.Bundle
 import android.content.Intent
-import android.text.InputType
-import android.view.LayoutInflater
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 
 class MainActivity : AppCompatActivity() {
     private lateinit var btnPublicAlbum: MaterialButton
     private lateinit var btnPrivateAlbum: MaterialButton
+
+    private lateinit var btnCameraTest: MaterialButton  // 测试摄像头的按钮
 
     private val DEFAULT_PASSWORD="123456"
 
@@ -37,6 +31,8 @@ class MainActivity : AppCompatActivity() {
         //初始化按钮
         btnPublicAlbum=findViewById(R.id.btnPublicAlbum)
         btnPrivateAlbum=findViewById(R.id.btnPrivateAlbum)
+
+        btnCameraTest = findViewById(R.id.btnCameraTest)  // 初始化测试摄像头按钮
     }
 
     private fun setupClickListeners(){
@@ -48,6 +44,17 @@ class MainActivity : AppCompatActivity() {
         btnPrivateAlbum.setOnClickListener {
             navigatetoPrivateAlbum()
         }
+
+        // 摄像头测试按钮
+        btnCameraTest.setOnClickListener {
+            navigateToCameraTest()
+        }
+    }
+
+    //摄像头测试函数
+    private fun navigateToCameraTest() {
+        val intent = Intent(this, CameraTestActivity::class.java)
+        startActivity(intent)
     }
 
     private fun navigateToPublicAlbum(){

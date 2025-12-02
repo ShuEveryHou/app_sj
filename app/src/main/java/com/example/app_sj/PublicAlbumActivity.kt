@@ -1,20 +1,22 @@
 package com.example.app_sj
 
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.Window
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class PublicAlbumActivity : AppCompatActivity() {
 
     private lateinit var rvPhotos: RecyclerView
     private lateinit var photoAdapter: PhotoAdapter
+    //支持相机功能
+    private lateinit var fabCamera: FloatingActionButton
+    //照片ID计数器
+    private var photoIdCounter = 50//从50开始，避免和本地图片冲突
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +85,22 @@ class PublicAlbumActivity : AppCompatActivity() {
             Pair("bao_12","图12"),
             Pair("bao_13","图13"),
             Pair("bao_14","图14"),
-
+            Pair("pic_1","图15"),
+            Pair("pic_2","图16"),
+            Pair("pic_3","图17"),
+            Pair("pic_4","图18"),
+            Pair("pic_5","图19"),
+            Pair("pic_6","图20"),
+            Pair("pic_7","图21"),
+            Pair("pic_8","图22"),
+            Pair("pic_9","图23"),
+            Pair("pic_10","图24"),
+            Pair("pic_11","图25"),
+            Pair("pic_12","图26"),
+            Pair("pic_13","图27"),
+            Pair("pic_14","图28"),
+            Pair("pic_15","图29"),
+            Pair("pic_16","图30"),
         )
 
         // 创建Photo对象列表
@@ -131,4 +148,5 @@ class PublicAlbumActivity : AppCompatActivity() {
     private fun Int.dpToPx(): Int {
         return (this * resources.displayMetrics.density).toInt()
     }
+
 }

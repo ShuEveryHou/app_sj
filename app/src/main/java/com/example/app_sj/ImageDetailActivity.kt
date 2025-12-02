@@ -1,15 +1,14 @@
 package com.example.app_sj
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import java.io.File
 
 class ImageDetailActivity: AppCompatActivity() {
     private lateinit var  ivDetail: ImageView
@@ -22,11 +21,14 @@ class ImageDetailActivity: AppCompatActivity() {
     private lateinit var btnDelete: Button
     private lateinit var btnText: Button
 
-    private var isUIVisible = false//显示操作栏状态
+
+    private var isUIVisible = false //显示操作栏状态,初始不可见
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image_detail)
+
 
         initViews()
         setupCLickListeners()
@@ -110,5 +112,24 @@ class ImageDetailActivity: AppCompatActivity() {
         isUIVisible =!isUIVisible
     }
 
+    private fun loadImage(photo: Photo){
+        try {
+            if (photo.isFromCamera && photo.filePath.isNotEmpty()) {
+                // 加载相机拍摄的图片
+                Glide.with(this)
+                    .load(File(photo.filePath))
+                    .fitCenter()
+                    .into(ivDetail)
+            } else if (photo.resourceId != 0) {
+                // 加载资源图片
+                Glide.with(this)
+                    .load(photo.resourceId)
+                    .fitCenter()
+                    .into(ivDetail)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
 }

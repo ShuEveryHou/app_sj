@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 外部存储目录 -->
+    <external-path
+        name="external_files"
+        path="." />
+    <!-- 外部图片目录 -->
+    <external-files-path
+        name="external_images"
+        path="Pictures" />
+    <!-- 缓存目录 -->
+    <cache-path
+        name="cache"
+        path="." />
+    <!-- 内部文件目录 -->
+    <files-path
+        name="files"
+        path="." />
+</paths>
+
+
+<!--    <?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+<external-path
+    name="my_images"
+    path="Android/data/com.example.app_sj/files/Pictures"/>
+<cache-path
+    name="my_cache"
+    path="."/>
+</paths>-->
+
