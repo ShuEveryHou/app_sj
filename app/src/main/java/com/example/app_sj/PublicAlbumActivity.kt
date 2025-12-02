@@ -121,7 +121,7 @@ class PublicAlbumActivity : AppCompatActivity() {
         photoAdapter.updatePhotos(samplePhotos)
     }
 
-    private fun openImageDetail(photo: Photo) {
+    /*private fun openImageDetail(photo: Photo) {
         // 创建Intent跳转到详情页面
         val intent = Intent(this, ImageDetailActivity::class.java).apply {
             putExtra("photo_id", photo.id)
@@ -132,6 +132,16 @@ class PublicAlbumActivity : AppCompatActivity() {
         // 启动详情页面
         startActivity(intent)
 
+    }*/
+    private fun openImageDetail(photo: Photo) {
+        val intent = Intent(this, ImageDetailActivity::class.java).apply {
+            putExtra("photo_id", photo.id)
+            putExtra("photo_resource_id", photo.resourceId)
+            putExtra("photo_title", photo.title)
+            putExtra("is_from_camera", photo.isFromCamera)
+        }
+        // 启动详情页面
+        startActivity(intent)
     }
 
     //返回主界面

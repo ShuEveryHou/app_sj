@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
-    <!-- 图片显示区域 - 始终显示 -->
-    <ImageView
+    <!-- 使用自定义的可缩放ImageView -->
+    <com.example.app_sj.ZoomableImageView
         android:id="@+id/ivDetail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        android:contentDescription="图片详情"
-        android:clickable="true" />
+        android:contentDescription="图片详情" />
 
     <!-- 顶部信息栏 -->
     <LinearLayout
@@ -20,8 +18,10 @@
         android:layout_height="wrap_content"
         android:background="#80000000"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:visibility="visible">
 
+        <!-- 返回按钮 -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="48dp"
@@ -30,6 +30,7 @@
             android:contentDescription="返回相册"
             android:tint="@android:color/white" />
 
+        <!-- 照片信息和缩放信息 -->
         <TextView
             android:id="@+id/tvPhotoInfo"
             android:layout_width="0dp"
@@ -41,6 +42,16 @@
             android:gravity="center"
             android:layout_gravity="center_vertical" />
 
+        <!-- 重置缩放按钮 -->
+        <ImageView
+            android:id="@+id/btnResetZoom"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_menu_zoom"
+            android:contentDescription="重置缩放"
+            android:tint="@android:color/white"
+            android:visibility="gone" />
+
     </LinearLayout>
 
     <!-- 底部操作栏 -->
@@ -51,8 +62,10 @@
         android:background="#80000000"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:layout_gravity="bottom">
+        android:layout_alignParentBottom="true"
+        android:visibility="visible">
 
+        <!-- 发送按钮 -->
         <Button
             android:id="@+id/btnSend"
             android:layout_width="0dp"
@@ -60,8 +73,9 @@
             android:layout_weight="1"
             android:text="发送"
             android:textColor="@android:color/white"
-             />
+            android:textAllCaps="false" />
 
+        <!-- 编辑按钮 -->
         <Button
             android:id="@+id/btnEdit"
             android:layout_width="0dp"
@@ -69,8 +83,9 @@
             android:layout_weight="1"
             android:text="编辑"
             android:textColor="@android:color/white"
-             />
+            android:textAllCaps="false" />
 
+        <!-- 删除按钮 -->
         <Button
             android:id="@+id/btnDelete"
             android:layout_width="0dp"
@@ -78,8 +93,9 @@
             android:layout_weight="1"
             android:text="删除"
             android:textColor="@android:color/white"
-             />
+            android:textAllCaps="false" />
 
+        <!-- 文字按钮 -->
         <Button
             android:id="@+id/btnText"
             android:layout_width="0dp"
@@ -87,8 +103,21 @@
             android:layout_weight="1"
             android:text="文字"
             android:textColor="@android:color/white"
-             />
+            android:textAllCaps="false" />
 
     </LinearLayout>
 
-</FrameLayout>
+    <!-- 缩放提示（临时显示） -->
+    <TextView
+        android:id="@+id/tvZoomHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="双指缩放，双击恢复"
+        android:textColor="#80FFFFFF"
+        android:textSize="14sp"
+        android:padding="8dp"
+        android:background="#40000000"
+        android:visibility="gone" />
+
+</RelativeLayout>

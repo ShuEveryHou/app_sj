@@ -1,6 +1,7 @@
 package com.example.app_sj
 
 import android.os.Bundle
+import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -8,14 +9,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import java.io.File
+
 
 class ImageDetailActivity: AppCompatActivity() {
-    private lateinit var  ivDetail: ImageView
+    private lateinit var  ivDetail: ZoomableImageView
     private lateinit var layoutTopBar: LinearLayout
     private lateinit var layoutBottomBar: LinearLayout
     private lateinit var tvPhotoInfo: TextView
+    private lateinit var tvZoomHint: TextView
     private lateinit var btnBack: ImageView
+    private lateinit var btnResetZoom: ImageView
     private lateinit var btnSend: Button
     private lateinit var btnEdit: Button
     private lateinit var btnDelete: Button
@@ -23,6 +26,7 @@ class ImageDetailActivity: AppCompatActivity() {
 
 
     private var isUIVisible = false //显示操作栏状态,初始不可见
+    private val  handler = android.os.Handler(Looper.getMainLooper())
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,14 +37,17 @@ class ImageDetailActivity: AppCompatActivity() {
         initViews()
         setupCLickListeners()
         loadImageData()
+        showZoomHintTemporarily()
     }
 
     private fun initViews(){
-        ivDetail = findViewById(R.id.ivDetail)
+        ivDetail = findViewById(R.id.ivDetail)  // 现在使用ZoomableImageView
         layoutTopBar = findViewById(R.id.layoutTopBar)
         layoutBottomBar = findViewById(R.id.layoutBottomBar)
         tvPhotoInfo = findViewById(R.id.tvPhotoInfo)
+        tvZoomHint = findViewById(R.id.tvZoomHint)
         btnBack = findViewById(R.id.btnBack)
+        btnResetZoom = findViewById(R.id.btnResetZoom)
         btnSend = findViewById(R.id.btnSend)
         btnEdit = findViewById(R.id.btnEdit)
         btnDelete = findViewById(R.id.btnDelete)
@@ -56,6 +63,11 @@ class ImageDetailActivity: AppCompatActivity() {
         //切换图片细节UI
         ivDetail.setOnClickListener {
             toggleUI()
+        }
+
+        // 重置缩放按钮
+        btnResetZoom.setOnClickListener {
+            ivDetail.resetZoom()
         }
 
         //发送按钮
@@ -77,24 +89,41 @@ class ImageDetailActivity: AppCompatActivity() {
     }
 
     private fun loadImageData(){
-        val photoId = intent.getIntExtra("photo_id",0)
-        val resourceId = intent.getIntExtra("photo_resource_id",0)
-        val photoTitle = intent.getStringExtra("photo_title")?:"未命名图片"
 
-        tvPhotoInfo.text = "图片ID: $photoId - $photoTitle"
+        val photoId = intent.getIntExtra("photo_id", 0)
+        val resourceId = intent.getIntExtra("photo_resource_id", 0)
+        val filePath = intent.getStringExtra("photo_file_path") ?: ""
+        val photoTitle = intent.getStringExtra("photo_title") ?: "未命名图片"
+        val isFromCamera = intent.getBooleanExtra("is_from_camera", false)
 
-        loadImage(resourceId)
+        // 设置照片信息文本
+        tvPhotoInfo.text = "${photoTitle} (ID: ${photoId})"
+
+        // 加载图片
+        loadImage(resourceId, filePath, isFromCamera)
     }
 
-    private fun loadImage(resourceId: Int){
+    private fun loadImage(resourceId: Int, filePath: String, isFromCamera: Boolean) {
         try {
-            if (resourceId != 0) {
-                // 使用Glide加载资源图片
+            if (isFromCamera && filePath.isNotEmpty()) {
+                // 加载相机拍摄的图片
+                Glide.with(this)
+                    .load(filePath)
+                    .fitCenter()
+                    .into(ivDetail)
+            } else if (resourceId != 0) {
+                // 加载资源图片
                 Glide.with(this)
                     .load(resourceId)
-                    .fitCenter()  // 保持比例，完整显示
+                    .fitCenter()
                     .into(ivDetail)
             }
+
+            // 图片加载完成后，重置缩放状态
+            ivDetail.postDelayed({
+                ivDetail.resetZoom()
+            }, 100)
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -105,31 +134,39 @@ class ImageDetailActivity: AppCompatActivity() {
             //隐藏UI元素
             layoutTopBar.visibility = View.GONE
             layoutBottomBar.visibility = View.GONE
+            btnResetZoom.visibility = View.GONE
         }else{
             layoutTopBar.visibility = View.VISIBLE
             layoutBottomBar.visibility = View.VISIBLE
+            btnResetZoom.visibility = View.VISIBLE
         }
         isUIVisible =!isUIVisible
     }
 
-    private fun loadImage(photo: Photo){
-        try {
-            if (photo.isFromCamera && photo.filePath.isNotEmpty()) {
-                // 加载相机拍摄的图片
-                Glide.with(this)
-                    .load(File(photo.filePath))
-                    .fitCenter()
-                    .into(ivDetail)
-            } else if (photo.resourceId != 0) {
-                // 加载资源图片
-                Glide.with(this)
-                    .load(photo.resourceId)
-                    .fitCenter()
-                    .into(ivDetail)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    //缩放提示
+    private fun showZoomHintTemporarily() {
+        tvZoomHint.visibility = View.VISIBLE
+        tvZoomHint.alpha = 1.0f
+
+        // 3秒后淡出
+        handler.postDelayed({
+            tvZoomHint.animate()
+                .alpha(0f)
+                .setDuration(1000)
+                .withEndAction {
+                    tvZoomHint.visibility = View.GONE
+                }
+                .start()
+        }, 3000)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
     }
 
 }
