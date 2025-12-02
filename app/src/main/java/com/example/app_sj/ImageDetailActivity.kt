@@ -9,10 +9,15 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import java.io.File
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.request.target.Target
 
 
 class ImageDetailActivity: AppCompatActivity() {
-    private lateinit var  ivDetail: ZoomableImageView
+    private lateinit var ivDetail: ZoomableImageView
     private lateinit var layoutTopBar: LinearLayout
     private lateinit var layoutBottomBar: LinearLayout
     private lateinit var tvPhotoInfo: TextView
@@ -52,6 +57,9 @@ class ImageDetailActivity: AppCompatActivity() {
         btnEdit = findViewById(R.id.btnEdit)
         btnDelete = findViewById(R.id.btnDelete)
         btnText = findViewById(R.id.btnText)
+
+        // 预加载时先设置一个透明占位符，避免空白
+        ivDetail.setBackgroundColor(0x00000000)
     }
 
     private fun setupCLickListeners(){
@@ -100,10 +108,12 @@ class ImageDetailActivity: AppCompatActivity() {
         tvPhotoInfo.text = "${photoTitle} (ID: ${photoId})"
 
         // 加载图片
-        loadImage(resourceId, filePath, isFromCamera)
+        //loadImage(resourceId, filePath, isFromCamera)
+
+        loadImageFast(resourceId, filePath, isFromCamera)
     }
 
-    private fun loadImage(resourceId: Int, filePath: String, isFromCamera: Boolean) {
+    /*private fun loadImage(resourceId: Int, filePath: String, isFromCamera: Boolean) {
         try {
             if (isFromCamera && filePath.isNotEmpty()) {
                 // 加载相机拍摄的图片
@@ -126,6 +136,60 @@ class ImageDetailActivity: AppCompatActivity() {
 
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }*/
+
+    private fun loadImageFast(resourceId: Int, filePath: String, isFromCamera: Boolean) {
+        // 方案1：使用Glide的thumbnail先显示缩略图
+        if (isFromCamera && filePath.isNotEmpty()) {
+            // 加载相机图片
+            Glide.with(this)
+                .load(File(filePath))
+                .sizeMultiplier(0.5f)  // 先显示50%质量的缩略图
+                .listener(createGlideListener())
+                .into(ivDetail)
+        } else {
+            // 加载资源图片
+            Glide.with(this)
+                .load(resourceId)
+                .sizeMultiplier(0.5f)  // 先显示50%质量的缩略图
+                .listener(createGlideListener())
+                .into(ivDetail)
+        }
+    }
+
+    private fun createGlideListener(): com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+        return object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+            override fun onLoadFailed(
+                e: com.bumptech.glide.load.engine.GlideException?,
+                model: Any?,
+                target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>,
+                isFirstResource: Boolean
+            ): Boolean {
+                // 加载失败，也尝试居中
+                ivDetail.post { ivDetail.resetZoom() }
+                return false
+            }
+
+            override fun onResourceReady(
+                resource: android.graphics.drawable.Drawable,
+                model: Any,
+                target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>,
+                dataSource: com.bumptech.glide.load.DataSource,
+                isFirstResource: Boolean
+            ): Boolean {
+                // 图片加载完成后，立即居中
+                ivDetail.post { ivDetail.resetZoom() }
+                return false
+            }
+        }
+    }
+    companion object {
+        fun preloadImage(context: android.content.Context, resourceId: Int) {
+            // 在打开详情页前预加载
+            Glide.with(context)
+                .load(resourceId)
+                .preload()  // 预加载到缓存
         }
     }
 

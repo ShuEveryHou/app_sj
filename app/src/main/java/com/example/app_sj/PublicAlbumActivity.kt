@@ -134,6 +134,9 @@ class PublicAlbumActivity : AppCompatActivity() {
 
     }*/
     private fun openImageDetail(photo: Photo) {
+        // 预加载图片到缓存
+        ImageDetailActivity.preloadImage(this, photo.resourceId)
+
         val intent = Intent(this, ImageDetailActivity::class.java).apply {
             putExtra("photo_id", photo.id)
             putExtra("photo_resource_id", photo.resourceId)
