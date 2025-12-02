@@ -60,6 +60,11 @@
             android:exported="true"
             android:label="摄像头测试" />
 
+        <activity
+            android:name=".ImageCropActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
     </application>
 
 </manifest>

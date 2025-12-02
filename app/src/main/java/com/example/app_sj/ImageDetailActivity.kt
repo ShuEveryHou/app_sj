@@ -1,5 +1,6 @@
 package com.example.app_sj
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Looper
 import android.view.View
@@ -7,6 +8,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.GlideException
@@ -33,6 +35,16 @@ class ImageDetailActivity: AppCompatActivity() {
     private var isUIVisible = false //显示操作栏状态,初始不可见
     private val  handler = android.os.Handler(Looper.getMainLooper())
 
+
+    // 当前图片数据
+    private var currentPhotoId = 0
+    private var currentResourceId = 0
+    private var currentFilePath = ""
+    private var currentPhotoTitle = ""
+    private var isFromCamera = false
+
+    // 裁剪后的图片路径（新添加的变量）
+    private var croppedImagePath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,9 +94,9 @@ class ImageDetailActivity: AppCompatActivity() {
         btnSend.setOnClickListener {
 
         }
-        //编辑按钮
+        //剪裁按钮
         btnEdit.setOnClickListener {
-
+            showCropOptionsDialog()
         }
         //删除按钮
         btnDelete.setOnClickListener {
@@ -108,36 +120,9 @@ class ImageDetailActivity: AppCompatActivity() {
         tvPhotoInfo.text = "${photoTitle} (ID: ${photoId})"
 
         // 加载图片
-        //loadImage(resourceId, filePath, isFromCamera)
 
         loadImageFast(resourceId, filePath, isFromCamera)
     }
-
-    /*private fun loadImage(resourceId: Int, filePath: String, isFromCamera: Boolean) {
-        try {
-            if (isFromCamera && filePath.isNotEmpty()) {
-                // 加载相机拍摄的图片
-                Glide.with(this)
-                    .load(filePath)
-                    .fitCenter()
-                    .into(ivDetail)
-            } else if (resourceId != 0) {
-                // 加载资源图片
-                Glide.with(this)
-                    .load(resourceId)
-                    .fitCenter()
-                    .into(ivDetail)
-            }
-
-            // 图片加载完成后，重置缩放状态
-            ivDetail.postDelayed({
-                ivDetail.resetZoom()
-            }, 100)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }*/
 
     private fun loadImageFast(resourceId: Int, filePath: String, isFromCamera: Boolean) {
         // 方案1：使用Glide的thumbnail先显示缩略图
@@ -222,6 +207,69 @@ class ImageDetailActivity: AppCompatActivity() {
                 }
                 .start()
         }, 3000)
+    }
+
+
+    private fun showCropOptionsDialog() {
+        val cropOptions = arrayOf(
+            "自由裁剪",
+            "1:1 (正方形)",
+            "4:3 (横屏)",
+            "16:9 (宽屏)",
+            "3:4 (竖屏)",
+            "9:16 (手机屏幕)"
+        )
+
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("选择裁剪比例")
+            .setItems(cropOptions) { _, which ->
+                // 这里我们不再使用旧的CropRatio枚举，直接传递比例值
+                startImageCrop(which)
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
+
+    private fun startImageCrop(optionIndex: Int) {
+        try {
+            // 启动我们手写的裁剪Activity
+            ImageCropActivity.startForResult(
+                activity = this,
+                imagePath = if (isFromCamera && currentFilePath.isNotEmpty()) currentFilePath else null,
+                resourceId = if (!isFromCamera) currentResourceId else 0,
+                isFromCamera = isFromCamera
+            )
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "无法启动裁剪: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // 处理裁剪结果（新增这部分）
+        if (requestCode == ImageCropActivity.REQUEST_CROP) {
+            if (resultCode == RESULT_OK && data != null) {
+                val croppedPath = data.getStringExtra(ImageCropActivity.EXTRA_CROPPED_PATH)
+                if (croppedPath != null) {
+                    // 显示裁剪后的图片
+                    Glide.with(this)
+                        .load(File(croppedPath))
+                        .into(ivDetail)
+
+                    // 更新UI
+                    tvPhotoInfo.text = "${currentPhotoTitle} (已裁剪)"
+                    Toast.makeText(this, "裁剪完成", Toast.LENGTH_SHORT).show()
+
+                    // 保存裁剪后的路径，用于后续保存到相册
+                    croppedImagePath = croppedPath
+                }
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "裁剪已取消", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onBackPressed() {
