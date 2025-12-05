@@ -25,14 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <!-- 裁剪区域实时预览（半透明覆盖） -->
-        <ImageView
-            android:id="@+id/cropPreview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="matrix"
-            android:alpha="0.3"
-            android:visibility="gone" />
+        <!-- 删除cropPreview ImageView，因为不需要实时预览 -->
 
     </FrameLayout>
 
@@ -133,82 +126,96 @@
 
         </LinearLayout>
 
-        <!-- 比例选择区域 -->
-        <LinearLayout
-            android:id="@+id/ratioContainer"
+        <!-- 比例选择区域 - 使用HorizontalScrollView包装 -->
+        <HorizontalScrollView
+            android:id="@+id/scrollRatioContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginTop="12dp"
-            android:gravity="center">
+            android:scrollbars="none"
+            android:fillViewport="true">
 
-            <!-- 自由比例 -->
-            <Button
-                android:id="@+id/btnFree"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="自由"
-                android:textColor="@android:color/white"
-                android:background="@drawable/btn_ratio_selector"
-                android:textAllCaps="false" />
+            <LinearLayout
+                android:id="@+id/ratioContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-            <!-- 1:1 比例 -->
-            <Button
-                android:id="@+id/btn1_1"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="1:1"
-                android:textColor="@android:color/white"
-                android:background="@drawable/btn_ratio_selector"
-                android:textAllCaps="false" />
+                <!-- 自由比例 -->
+                <Button
+                    android:id="@+id/btnFree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:minWidth="80dp"
+                    android:text="自由"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/btn_ratio_selector"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp" />
 
-            <!-- 4:3 比例 -->
-            <Button
-                android:id="@+id/btn4_3"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="4:3"
-                android:textColor="@android:color/white"
-                android:background="@drawable/btn_ratio_selector"
-                android:textAllCaps="false" />
+                <!-- 1:1 比例 -->
+                <Button
+                    android:id="@+id/btn1_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:minWidth="80dp"
+                    android:text="1:1"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/btn_ratio_selector"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp" />
 
-            <!-- 3:4 比例 -->
-            <Button
-                android:id="@+id/btn3_4"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="3:4"
-                android:textColor="@android:color/white"
-                android:background="@drawable/btn_ratio_selector"
-                android:textAllCaps="false" />
+                <!-- 4:3 比例 -->
+                <Button
+                    android:id="@+id/btn4_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:minWidth="80dp"
+                    android:text="4:3"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/btn_ratio_selector"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp" />
 
-            <!-- 16:9 比例 -->
-            <Button
-                android:id="@+id/btn16_9"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="16:9"
-                android:textColor="@android:color/white"
-                android:background="@drawable/btn_ratio_selector"
-                android:textAllCaps="false" />
+                <!-- 3:4 比例 -->
+                <Button
+                    android:id="@+id/btn3_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:minWidth="80dp"
+                    android:text="3:4"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/btn_ratio_selector"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp" />
 
-            <!-- 9:16 比例 -->
-            <Button
-                android:id="@+id/btn9_16"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="9:16"
-                android:textColor="@android:color/white"
-                android:background="@drawable/btn_ratio_selector"
-                android:textAllCaps="false" />
+                <!-- 16:9 比例 -->
+                <Button
+                    android:id="@+id/btn16_9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:minWidth="80dp"
+                    android:text="16:9"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/btn_ratio_selector"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp" />
 
-        </LinearLayout>
+                <!-- 9:16 比例 -->
+                <Button
+                    android:id="@+id/btn9_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:minWidth="80dp"
+                    android:text="9:16"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/btn_ratio_selector"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
 
     </LinearLayout>
 

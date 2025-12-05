@@ -24,7 +24,6 @@ class NewCropActivity : AppCompatActivity() {
     // ========== 视图组件声明 ==========
     private lateinit var cropImageView: ZoomableImageView
     private lateinit var cropOverlayView: CropOverlayView
-    private lateinit var cropPreview: ImageView
     private lateinit var btnCancel: TextView
     private lateinit var btnReset: TextView
     private lateinit var btnDone: TextView
@@ -42,15 +41,12 @@ class NewCropActivity : AppCompatActivity() {
 
     // ========== 图片数据 ==========
     private var originalBitmap: Bitmap? = null
-    private var currentBitmap: Bitmap? = null
     private var imagePath: String? = null
     private var resourceId: Int = 0
     private var isFromCamera: Boolean = false
 
     // ========== 裁剪相关状态 ==========
     private var currentRatio: Float = 0f  // 0表示自由比例
-    private var originalMatrix: Matrix = Matrix()
-    private var originalCropRect: RectF = RectF()
 
     companion object {
         const val REQUEST_NEW_CROP = 200
@@ -74,7 +70,6 @@ class NewCropActivity : AppCompatActivity() {
     private fun initViews() {
         cropImageView = findViewById(R.id.cropImageView)
         cropOverlayView = findViewById(R.id.cropOverlayView)
-        cropPreview = findViewById(R.id.cropPreview)
         btnCancel = findViewById(R.id.btnCancel)
         btnReset = findViewById(R.id.btnReset)
         btnDone = findViewById(R.id.btnDone)
@@ -96,7 +91,7 @@ class NewCropActivity : AppCompatActivity() {
     }
 
     /**
-     * 加载图片数据
+     * 加载图片数据 - 简化版本，只用Glide加载显示，不保存Bitmap
      */
     private fun loadImageData() {
         // 从Intent获取图片数据
@@ -104,82 +99,21 @@ class NewCropActivity : AppCompatActivity() {
         resourceId = intent.getIntExtra("photo_resource_id", 0)
         isFromCamera = intent.getBooleanExtra("is_from_camera", false)
 
-        // 加载图片
+        // 直接使用Glide加载图片显示，不保存Bitmap到内存
         if (isFromCamera && !imagePath.isNullOrEmpty()) {
             // 从文件加载
-            loadBitmapFromFile(imagePath!!)
+            Glide.with(this)
+                .load(File(imagePath))
+                .into(cropImageView)
+
         } else if (resourceId != 0) {
             // 从资源加载
-            loadBitmapFromResource(resourceId)
+            Glide.with(this)
+                .load(resourceId)
+                .into(cropImageView)
+
         } else {
             Toast.makeText(this, "图片数据错误", Toast.LENGTH_SHORT).show()
-            finish()
-        }
-    }
-
-    /**
-     * 从文件加载Bitmap
-     */
-    private fun loadBitmapFromFile(filePath: String) {
-        try {
-            // 获取图片尺寸
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
-            }
-            BitmapFactory.decodeFile(filePath, options)
-
-            // 计算合适的采样率（限制最大尺寸为2048）
-            val maxSize = 2048
-            val width = options.outWidth
-            val height = options.outHeight
-            var scale = 1
-
-            if (width > maxSize || height > maxSize) {
-                val scaleX = width.toFloat() / maxSize
-                val scaleY = height.toFloat() / maxSize
-                scale = max(scaleX, scaleY).toInt()
-            }
-
-            // 加载Bitmap
-            val loadOptions = BitmapFactory.Options().apply {
-                inSampleSize = scale
-                inPreferredConfig = Bitmap.Config.ARGB_8888
-            }
-
-            originalBitmap = BitmapFactory.decodeFile(filePath, loadOptions)
-            currentBitmap = originalBitmap?.copy(Bitmap.Config.ARGB_8888, true)
-
-            // 显示图片
-            cropImageView.setImageBitmap(currentBitmap)
-
-            // 保存原始状态
-            originalMatrix.set(cropImageView.imageMatrix)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "图片加载失败", Toast.LENGTH_SHORT).show()
-            finish()
-        }
-    }
-
-    /**
-     * 从资源加载Bitmap
-     */
-    private fun loadBitmapFromResource(resId: Int) {
-        try {
-            // 从资源加载
-            originalBitmap = BitmapFactory.decodeResource(resources, resId)
-            currentBitmap = originalBitmap?.copy(Bitmap.Config.ARGB_8888, true)
-
-            // 显示图片
-            cropImageView.setImageBitmap(currentBitmap)
-
-            // 保存原始状态
-            originalMatrix.set(cropImageView.imageMatrix)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "图片加载失败", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
@@ -205,7 +139,6 @@ class NewCropActivity : AppCompatActivity() {
         }
 
         // ========== 比例按钮监听器设置 ==========
-        // 这里只定义一个ratioButtons变量
         val ratioButtons = listOf(
             Pair(btnFree, 0f),      // 自由比例
             Pair(btn1_1, 1f),       // 1:1 正方形
@@ -223,23 +156,14 @@ class NewCropActivity : AppCompatActivity() {
         }
 
         // ========== 裁剪框变化监听器 ==========
+        // 注意：这里移除了updateCropPreview的调用，因为不需要实时预览
         cropOverlayView.setOnCropChangeListener(object : CropOverlayView.OnCropChangeListener {
             override fun onCropChanged(cropRect: RectF) {
-                updateCropPreview()
+                // 不需要实时预览，所以这里什么都不做
+                // 或者可以添加一些简单的日志
+                // Log.d("Crop", "裁剪框变化: $cropRect")
             }
         })
-
-        // ========== 标签点击监听器 ==========
-        tabCrop.setOnClickListener {
-            // 切换到裁剪标签
-            selectTab(true)
-        }
-
-        tabRotate.setOnClickListener {
-            // 切换到旋转标签（暂未实现）
-            selectTab(false)
-            Toast.makeText(this, "旋转功能待实现", Toast.LENGTH_SHORT).show()
-        }
     }
 
     /**
@@ -269,48 +193,14 @@ class NewCropActivity : AppCompatActivity() {
 
         // 显示还原按钮
         btnReset.visibility = View.VISIBLE
-
-        // 更新预览
-        updateCropPreview()
-    }
-
-    /**
-     * 选择标签（裁剪/旋转）
-     * @param isCropTab true表示裁剪标签，false表示旋转标签
-     */
-    private fun selectTab(isCropTab: Boolean) {
-        if (isCropTab) {
-            // 选中裁剪标签
-            tabCrop.setTextColor(Color.WHITE)
-            tabCrop.setBackgroundColor(Color.parseColor("#40000000"))
-            tabRotate.setTextColor(Color.parseColor("#80FFFFFF"))
-            tabRotate.setBackgroundColor(Color.TRANSPARENT)
-            ratioContainer.visibility = View.VISIBLE
-        } else {
-            // 选中旋转标签
-            tabRotate.setTextColor(Color.WHITE)
-            tabRotate.setBackgroundColor(Color.parseColor("#40000000"))
-            tabCrop.setTextColor(Color.parseColor("#80FFFFFF"))
-            tabCrop.setBackgroundColor(Color.TRANSPARENT)
-            ratioContainer.visibility = View.GONE
-        }
     }
 
     /**
      * 重置到原始状态
      */
     private fun resetToOriginal() {
-        // 重置图片
-        currentBitmap?.recycle()
-        currentBitmap = originalBitmap?.copy(Bitmap.Config.ARGB_8888, true)
-        cropImageView.setImageBitmap(currentBitmap)
-        cropImageView.imageMatrix = originalMatrix
-
         // 重置裁剪框
         cropOverlayView.resetCropRect()
-
-        // 隐藏预览
-        cropPreview.visibility = View.GONE
 
         // 重置比例选择
         selectRatio(0f)
@@ -322,132 +212,50 @@ class NewCropActivity : AppCompatActivity() {
     }
 
     /**
-     * 更新裁剪预览
-     */
-    private fun updateCropPreview() {
-        if (currentBitmap == null) return
-
-        val cropRect = cropOverlayView.getCropRect()
-
-        // 转换裁剪框坐标到图片坐标
-        val imageRect = getImageDisplayRect()
-        if (imageRect.width() <= 0 || imageRect.height() <= 0) return
-
-        val scaleX = currentBitmap!!.width.toFloat() / imageRect.width()
-        val scaleY = currentBitmap!!.height.toFloat() / imageRect.height()
-
-        val cropRectInImage = RectF(
-            (cropRect.left - imageRect.left) * scaleX,
-            (cropRect.top - imageRect.top) * scaleY,
-            (cropRect.right - imageRect.left) * scaleX,
-            (cropRect.bottom - imageRect.top) * scaleY
-        )
-
-        // 确保裁剪区域在图片范围内
-        cropRectInImage.left = max(0f, cropRectInImage.left)
-        cropRectInImage.top = max(0f, cropRectInImage.top)
-        cropRectInImage.right = min(currentBitmap!!.width.toFloat(), cropRectInImage.right)
-        cropRectInImage.bottom = min(currentBitmap!!.height.toFloat(), cropRectInImage.bottom)
-
-        // 创建裁剪预览
-        if (cropRectInImage.width() > 0 && cropRectInImage.height() > 0) {
-            try {
-                val previewBitmap = Bitmap.createBitmap(
-                    currentBitmap!!,
-                    cropRectInImage.left.toInt(),
-                    cropRectInImage.top.toInt(),
-                    cropRectInImage.width().toInt(),
-                    cropRectInImage.height().toInt()
-                )
-
-                // 显示预览
-                cropPreview.setImageBitmap(previewBitmap)
-                cropPreview.visibility = View.VISIBLE
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                cropPreview.visibility = View.GONE
-            }
-        } else {
-            cropPreview.visibility = View.GONE
-        }
-    }
-
-    /**
-     * 获取图片在ImageView中的显示区域
-     */
-    private fun getImageDisplayRect(): RectF {
-        val drawable = cropImageView.drawable ?: return RectF()
-        val matrix = cropImageView.imageMatrix
-
-        val bounds = RectF(
-            0f, 0f,
-            drawable.intrinsicWidth.toFloat(),
-            drawable.intrinsicHeight.toFloat()
-        )
-
-        matrix.mapRect(bounds)
-        return bounds
-    }
-
-    /**
-     * 执行裁剪操作
+     * 执行裁剪操作 - 简化版本
      */
     private fun performCrop() {
-        if (currentBitmap == null) {
+        // 直接使用Glide加载的Bitmap进行裁剪
+        val drawable = cropImageView.drawable ?: run {
             Toast.makeText(this, "图片未加载", Toast.LENGTH_SHORT).show()
             return
         }
 
         try {
-            // 获取裁剪区域
+            // 1. 获取裁剪区域（相对于裁剪框视图的坐标）
             val cropRect = cropOverlayView.getCropRect()
-            val imageRect = getImageDisplayRect()
 
+            // 2. 获取图片显示区域
+            val imageRect = getImageDisplayRect(drawable)
             if (imageRect.width() <= 0 || imageRect.height() <= 0) {
                 Toast.makeText(this, "无法获取图片显示区域", Toast.LENGTH_SHORT).show()
                 return
             }
 
-            // 转换坐标
-            val scaleX = currentBitmap!!.width.toFloat() / imageRect.width()
-            val scaleY = currentBitmap!!.height.toFloat() / imageRect.height()
-
-            val cropRectInImage = RectF(
-                (cropRect.left - imageRect.left) * scaleX,
-                (cropRect.top - imageRect.top) * scaleY,
-                (cropRect.right - imageRect.left) * scaleX,
-                (cropRect.bottom - imageRect.top) * scaleY
-            )
-
-            // 边界检查
-            cropRectInImage.left = max(0f, cropRectInImage.left)
-            cropRectInImage.top = max(0f, cropRectInImage.top)
-            cropRectInImage.right = min(currentBitmap!!.width.toFloat(), cropRectInImage.right)
-            cropRectInImage.bottom = min(currentBitmap!!.height.toFloat(), cropRectInImage.bottom)
-
-            val width = cropRectInImage.width().toInt()
-            val height = cropRectInImage.height().toInt()
-
-            if (width <= 0 || height <= 0) {
-                Toast.makeText(this, "裁剪区域无效", Toast.LENGTH_SHORT).show()
+            // 3. 获取ImageView中的Bitmap
+            val bitmap = getBitmapFromDrawable(drawable)
+            if (bitmap == null) {
+                Toast.makeText(this, "无法获取图片数据", Toast.LENGTH_SHORT).show()
                 return
             }
 
-            // 执行裁剪
+            // 4. 将裁剪框坐标转换为图片坐标
+            val cropRectInImage = convertCropRectToImageCoordinates(cropRect, imageRect, bitmap)
+
+            // 5. 创建裁剪后的Bitmap
             val croppedBitmap = Bitmap.createBitmap(
-                currentBitmap!!,
+                bitmap,
                 cropRectInImage.left.toInt(),
                 cropRectInImage.top.toInt(),
-                width,
-                height
+                cropRectInImage.width().toInt(),
+                cropRectInImage.height().toInt()
             )
 
-            // 保存裁剪后的图片
+            // 6. 保存裁剪后的图片
             val savedPath = saveCroppedImage(croppedBitmap)
 
             if (savedPath != null) {
-                // 返回结果
+                // 7. 返回结果
                 val result = Intent().apply {
                     putExtra("cropped_image_path", savedPath)
                 }
@@ -461,6 +269,71 @@ class NewCropActivity : AppCompatActivity() {
             e.printStackTrace()
             Toast.makeText(this, "裁剪失败: ${e.message}", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    /**
+     * 从Drawable获取Bitmap
+     */
+    private fun getBitmapFromDrawable(drawable: android.graphics.drawable.Drawable): Bitmap? {
+        return if (drawable is android.graphics.drawable.BitmapDrawable) {
+            drawable.bitmap
+        } else {
+            // 如果不是BitmapDrawable，创建一个新的Bitmap
+            val bitmap = Bitmap.createBitmap(
+                drawable.intrinsicWidth,
+                drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            bitmap
+        }
+    }
+
+    /**
+     * 获取图片在ImageView中的显示区域
+     */
+    private fun getImageDisplayRect(drawable: android.graphics.drawable.Drawable): RectF {
+        val matrix = cropImageView.imageMatrix
+
+        val bounds = RectF(
+            0f, 0f,
+            drawable.intrinsicWidth.toFloat(),
+            drawable.intrinsicHeight.toFloat()
+        )
+
+        matrix.mapRect(bounds)
+        return bounds
+    }
+
+    /**
+     * 将裁剪框坐标转换为图片坐标
+     */
+    private fun convertCropRectToImageCoordinates(
+        cropRectInOverlay: RectF,
+        imageRect: RectF,
+        bitmap: Bitmap
+    ): RectF {
+        // 计算转换比例
+        val scaleX = bitmap.width.toFloat() / imageRect.width()
+        val scaleY = bitmap.height.toFloat() / imageRect.height()
+
+        // 转换坐标
+        val cropRectInImage = RectF(
+            (cropRectInOverlay.left - imageRect.left) * scaleX,
+            (cropRectInOverlay.top - imageRect.top) * scaleY,
+            (cropRectInOverlay.right - imageRect.left) * scaleX,
+            (cropRectInOverlay.bottom - imageRect.top) * scaleY
+        )
+
+        // 边界检查
+        cropRectInImage.left = max(0f, cropRectInImage.left)
+        cropRectInImage.top = max(0f, cropRectInImage.top)
+        cropRectInImage.right = min(bitmap.width.toFloat(), cropRectInImage.right)
+        cropRectInImage.bottom = min(bitmap.height.toFloat(), cropRectInImage.bottom)
+
+        return cropRectInImage
     }
 
     /**
@@ -480,9 +353,9 @@ class NewCropActivity : AppCompatActivity() {
 
             val imageFile = File(storageDir, fileName)
 
-            // 高质量保存（100%质量）
+            // 保存Bitmap（使用90%质量，兼顾质量和文件大小）
             FileOutputStream(imageFile).use { outputStream ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
                 outputStream.flush()
             }
 
@@ -499,10 +372,8 @@ class NewCropActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // 释放内存
+        // 清理资源
         originalBitmap?.recycle()
-        currentBitmap?.recycle()
         originalBitmap = null
-        currentBitmap = null
     }
 }
