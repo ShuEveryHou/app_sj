@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <!-- 图片容器 -->
+    <FrameLayout
+        android:id="@+id/imageContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomToolbar">
+
+        <!-- 可缩放的图片视图 -->
+        <com.example.app_sj.ZoomableImageView
+            android:id="@+id/cropImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="matrix" />
+
+        <!-- 裁剪框覆盖层 -->
+        <com.example.app_sj.CropOverlayView
+            android:id="@+id/cropOverlayView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- 裁剪区域实时预览（半透明覆盖） -->
+        <ImageView
+            android:id="@+id/cropPreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="matrix"
+            android:alpha="0.3"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <!-- 顶部工具栏 -->
+    <LinearLayout
+        android:id="@+id/topToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#E6000000"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:gravity="center_vertical">
+
+        <!-- 取消按钮 -->
+        <TextView
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取消"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="8dp" />
+
+        <!-- 标题 -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="编辑图片"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:gravity="center" />
+
+        <!-- 还原按钮 -->
+        <TextView
+            android:id="@+id/btnReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="还原"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="8dp"
+            android:visibility="gone" />
+
+        <!-- 完成按钮 -->
+        <TextView
+            android:id="@+id/btnDone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="完成"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="8dp" />
+
+    </LinearLayout>
+
+    <!-- 底部工具栏 -->
+    <LinearLayout
+        android:id="@+id/bottomToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#E6000000"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- 功能选择标签 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- 裁剪标签 -->
+            <TextView
+                android:id="@+id/tabCrop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="裁剪"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="12dp"
+                android:background="#40000000" />
+
+            <!-- 旋转标签（占位，后续实现） -->
+            <TextView
+                android:id="@+id/tabRotate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="旋转"
+                android:textColor="#80FFFFFF"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="12dp" />
+
+        </LinearLayout>
+
+        <!-- 比例选择区域 -->
+        <LinearLayout
+            android:id="@+id/ratioContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:gravity="center">
+
+            <!-- 自由比例 -->
+            <Button
+                android:id="@+id/btnFree"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="自由"
+                android:textColor="@android:color/white"
+                android:background="@drawable/btn_ratio_selector"
+                android:textAllCaps="false" />
+
+            <!-- 1:1 比例 -->
+            <Button
+                android:id="@+id/btn1_1"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="1:1"
+                android:textColor="@android:color/white"
+                android:background="@drawable/btn_ratio_selector"
+                android:textAllCaps="false" />
+
+            <!-- 4:3 比例 -->
+            <Button
+                android:id="@+id/btn4_3"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="4:3"
+                android:textColor="@android:color/white"
+                android:background="@drawable/btn_ratio_selector"
+                android:textAllCaps="false" />
+
+            <!-- 3:4 比例 -->
+            <Button
+                android:id="@+id/btn3_4"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="3:4"
+                android:textColor="@android:color/white"
+                android:background="@drawable/btn_ratio_selector"
+                android:textAllCaps="false" />
+
+            <!-- 16:9 比例 -->
+            <Button
+                android:id="@+id/btn16_9"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="16:9"
+                android:textColor="@android:color/white"
+                android:background="@drawable/btn_ratio_selector"
+                android:textAllCaps="false" />
+
+            <!-- 9:16 比例 -->
+            <Button
+                android:id="@+id/btn9_16"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="9:16"
+                android:textColor="@android:color/white"
+                android:background="@drawable/btn_ratio_selector"
+                android:textAllCaps="false" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

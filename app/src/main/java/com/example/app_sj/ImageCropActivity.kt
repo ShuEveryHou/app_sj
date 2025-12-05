@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
 import android.os.Environment
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -70,64 +69,46 @@ class ImageCropActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_image_crop)
+        setContentView(R.layout.activity_crop_new)
 
         // 初始化视图
         initViews()
 
-        // 加载图片数据
-        loadImageData()
+        /*// 加载图片数据
+        loadImageData()*/
 
         // 设置事件监听
         setupListeners()
+
+        // 延迟加载图片，确保视图已布局完成
+        ivCropImage.post {
+            loadImageData()
+            // 默认选择自由比例
+            setCropRatio(0f)
+        }
     }
 
     /**
      * 初始化视图组件
      */
     private fun initViews() {
-        ivCropImage = findViewById(R.id.ivCropImage)
-        cropOverlay = findViewById(R.id.cropOverlay)
-        btnCancel = findViewById(R.id.btnCancel)
-        btnConfirm = findViewById(R.id.btnConfirm)
+        ivCropImage = findViewById(R.id.tabCrop)//剪裁
+        cropOverlay = findViewById(R.id.tabRotate)//旋转
+        btnCancel = findViewById(R.id.btnCancel)//取消
+        btnConfirm = findViewById(R.id.btnDone)//确认
 
         // 比例按钮
-        btnRatioFree = findViewById(R.id.btnRatioFree)
-        btnRatio1_1 = findViewById(R.id.btnRatio1_1)
-        btnRatio4_3 = findViewById(R.id.btnRatio4_3)
-        btnRatio16_9 = findViewById(R.id.btnRatio16_9)
-        btnRatio3_4 = findViewById(R.id.btnRatio3_4)
-        btnRatio9_16 = findViewById(R.id.btnRatio9_16)
+        btnRatioFree = findViewById(R.id.btnFree)//自由比例
+        btnRatio1_1 = findViewById(R.id.btn1_1)//1：1
+        btnRatio4_3 = findViewById(R.id.btn4_3)//4:3
+        btnRatio16_9 = findViewById(R.id.btn3_4)//3:4
+        btnRatio3_4 = findViewById(R.id.btn16_9)//16:9
+        btnRatio9_16 = findViewById(R.id.btn9_16)//9:16
     }
 
     /**
      * 加载图片数据
      */
-    /*private fun loadImageData() {
-        // 从Intent获取图片数据
-        imagePath = intent.getStringExtra(EXTRA_IMAGE_PATH)
-        resourceId = intent.getIntExtra(EXTRA_RESOURCE_ID, 0)
-        isFromCamera = intent.getBooleanExtra(EXTRA_IS_FROM_CAMERA, false)
-
-        // 加载图片到ImageView
-        if (isFromCamera && !imagePath.isNullOrEmpty()) {
-            // 从文件路径加载
-            Glide.with(this)
-                .load(File(imagePath))
-                .into(ivCropImage)
-
-            // 同时加载Bitmap用于裁剪
-            loadBitmapFromFile(imagePath!!)
-        } else if (resourceId != 0) {
-            // 从资源ID加载
-            Glide.with(this)
-                .load(resourceId)
-                .into(ivCropImage)
-
-            // 从资源加载Bitmap
-            imageBitmap = BitmapFactory.decodeResource(resources, resourceId)
-        }
-    }*/
     private fun loadImageData() {
         // 从Intent获取图片数据
         imagePath = intent.getStringExtra(EXTRA_IMAGE_PATH)
@@ -301,7 +282,11 @@ class ImageCropActivity : AppCompatActivity() {
      * 设置裁剪比例
      */
     private fun setCropRatio(ratio: Float) {
-        cropOverlay.cropRatio = ratio
+        // 使用公开方法设置比例
+        cropOverlay.setCropRatio(ratio)
+
+        // 显示裁剪框（使用公开方法）
+        cropOverlay.setShowCropRect(true)
 
         // 高亮当前选中的比例按钮
         updateRatioButtons(ratio)
@@ -320,6 +305,7 @@ class ImageCropActivity : AppCompatActivity() {
             btnRatio3_4 to (3f / 4f),
             btnRatio9_16 to (9f / 16f)
         )
+
 
         buttons.forEach { (button, ratio) ->
             if (ratio == selectedRatio) {

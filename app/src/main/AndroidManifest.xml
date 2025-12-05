@@ -52,18 +52,11 @@
         <activity android:name=".PublicAlbumActivity" android:exported="false"/>
         <activity android:name=".PrivateAlbumActivity" android:exported="false"/>
         <activity android:name=".GridSpacingItemDecoration" android:exported="false"/>
-        <activity android:name="Photo" android:exported="false"/>
+        <activity android:name=".Photo" android:exported="false"/>
         <activity android:name=".ImageDetailActivity" android:exported="false"/>
-
-        <activity
-            android:name=".CameraTestActivity"
-            android:exported="true"
-            android:label="摄像头测试" />
-
-        <activity
-            android:name=".ImageCropActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".CameraTestActivity" android:exported="false"/>
+        <activity android:name=".ImageCropActivity" android:exported="false"/>
+        <activity android:name=".NewCropActivity" android:exported="false"/>
 
     </application>
 
