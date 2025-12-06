@@ -5,13 +5,8 @@ import android.graphics.*
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -22,16 +17,27 @@ import kotlin.math.min
 class NewCropActivity : AppCompatActivity() {
 
     // ========== 视图组件声明 ==========
+    // 图片显示相关
     private lateinit var cropImageView: ZoomableImageView
     private lateinit var cropOverlayView: CropOverlayView
+    private lateinit var tvTitle: TextView
+    private lateinit var tvRotateStatus: TextView
+
+    // 顶部工具栏
     private lateinit var btnCancel: TextView
     private lateinit var btnReset: TextView
     private lateinit var btnDone: TextView
+
+    // 功能标签
     private lateinit var tabCrop: TextView
     private lateinit var tabRotate: TextView
+
+    // 布局容器
+    private lateinit var layoutCrop: LinearLayout
+    private lateinit var layoutRotate: LinearLayout
     private lateinit var ratioContainer: LinearLayout
 
-    // ========== 比例按钮声明 ==========
+    // 裁剪相关按钮
     private lateinit var btnFree: Button
     private lateinit var btn1_1: Button
     private lateinit var btn4_3: Button
@@ -39,14 +45,35 @@ class NewCropActivity : AppCompatActivity() {
     private lateinit var btn16_9: Button
     private lateinit var btn9_16: Button
 
-    // ========== 图片数据 ==========
-    private var originalBitmap: Bitmap? = null
+    // 旋转相关按钮
+    private lateinit var btnRotateClockwise: Button      // 顺时针
+    private lateinit var btnRotateCounterClockwise: Button // 逆时针
+    private lateinit var btnRotate180: Button            // 180°
+    private lateinit var btnFlipHorizontal: Button       // 水平翻转
+    private lateinit var btnFlipVertical: Button         // 垂直翻转
+
+    // ========== 数据状态 ==========
     private var imagePath: String? = null
     private var resourceId: Int = 0
     private var isFromCamera: Boolean = false
 
-    // ========== 裁剪相关状态 ==========
-    private var currentRatio: Float = 0f  // 0表示自由比例
+    // 当前功能模式：true=裁剪，false=旋转
+    private var isCropMode: Boolean = true
+
+    // 旋转相关状态
+    private var currentRotation: Float = 0f          // 当前旋转角度（0, 90, 180, 270）
+    private var isHorizontalFlipped: Boolean = false // 是否水平翻转
+    private var isVerticalFlipped: Boolean = false   // 是否垂直翻转
+
+    // 变换矩阵
+    private val transformMatrix: Matrix = Matrix()
+
+    // Bitmap
+    private var originalBitmap: Bitmap? = null
+    private var transformedBitmap: Bitmap? = null
+
+    // 防止频繁操作的标志
+    private var isTransforming: Boolean = false
 
     companion object {
         const val REQUEST_NEW_CROP = 200
@@ -60,7 +87,8 @@ class NewCropActivity : AppCompatActivity() {
         loadImageData()
         setupListeners()
 
-        // 默认选中自由比例
+        // 默认进入裁剪模式
+        switchToCropMode()
         selectRatio(0f)
     }
 
@@ -68,16 +96,27 @@ class NewCropActivity : AppCompatActivity() {
      * 初始化所有视图组件
      */
     private fun initViews() {
+        // 图片显示相关
         cropImageView = findViewById(R.id.cropImageView)
         cropOverlayView = findViewById(R.id.cropOverlayView)
+        tvTitle = findViewById(R.id.tvTitle)
+        tvRotateStatus = findViewById(R.id.tvRotateStatus)
+
+        // 顶部工具栏
         btnCancel = findViewById(R.id.btnCancel)
         btnReset = findViewById(R.id.btnReset)
         btnDone = findViewById(R.id.btnDone)
+
+        // 功能标签
         tabCrop = findViewById(R.id.tabCrop)
         tabRotate = findViewById(R.id.tabRotate)
+
+        // 布局容器
+        layoutCrop = findViewById(R.id.layoutCrop)
+        layoutRotate = findViewById(R.id.layoutRotate)
         ratioContainer = findViewById(R.id.ratioContainer)
 
-        // 初始化比例按钮
+        // 裁剪相关按钮
         btnFree = findViewById(R.id.btnFree)
         btn1_1 = findViewById(R.id.btn1_1)
         btn4_3 = findViewById(R.id.btn4_3)
@@ -85,13 +124,16 @@ class NewCropActivity : AppCompatActivity() {
         btn16_9 = findViewById(R.id.btn16_9)
         btn9_16 = findViewById(R.id.btn9_16)
 
-        // 隐藏旋转标签（暂未实现）
-        tabRotate.visibility = View.GONE
-        ratioContainer.visibility = View.VISIBLE
+        // 旋转相关按钮
+        btnRotateClockwise = findViewById(R.id.btnRotateClockwise)
+        btnRotateCounterClockwise = findViewById(R.id.btnRotateCounterClockwise)
+        btnRotate180 = findViewById(R.id.btnRotate180)
+        btnFlipHorizontal = findViewById(R.id.btnFlipHorizontal)
+        btnFlipVertical = findViewById(R.id.btnFlipVertical)
     }
 
     /**
-     * 加载图片数据 - 简化版本，只用Glide加载显示，不保存Bitmap
+     * 加载图片数据
      */
     private fun loadImageData() {
         // 从Intent获取图片数据
@@ -99,81 +141,246 @@ class NewCropActivity : AppCompatActivity() {
         resourceId = intent.getIntExtra("photo_resource_id", 0)
         isFromCamera = intent.getBooleanExtra("is_from_camera", false)
 
-        // 直接使用Glide加载图片显示，不保存Bitmap到内存
-        if (isFromCamera && !imagePath.isNullOrEmpty()) {
-            // 从文件加载
-            Glide.with(this)
-                .load(File(imagePath))
-                .into(cropImageView)
-
-        } else if (resourceId != 0) {
-            // 从资源加载
-            Glide.with(this)
-                .load(resourceId)
-                .into(cropImageView)
-
-        } else {
-            Toast.makeText(this, "图片数据错误", Toast.LENGTH_SHORT).show()
+        // 加载原始Bitmap（使用较小尺寸，避免内存问题）
+        try {
+            if (isFromCamera && !imagePath.isNullOrEmpty()) {
+                // 从文件加载，使用采样
+                originalBitmap = decodeSampledBitmapFromFile(imagePath!!, 1024, 1024)
+            } else if (resourceId != 0) {
+                // 从资源加载，使用采样
+                originalBitmap = decodeSampledBitmapFromResource(resourceId, 1024, 1024)
+            } else {
+                Toast.makeText(this, "图片数据错误", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "图片加载失败", Toast.LENGTH_SHORT).show()
             finish()
+            return
         }
+
+        // 初始化变换后的Bitmap
+        transformedBitmap = originalBitmap?.copy(Bitmap.Config.ARGB_8888, true)
+
+        // 显示图片
+        updateImageDisplay()
+        updateStatusText()
+    }
+
+    /**
+     * 从文件解码Bitmap，使用采样避免内存过大
+     */
+    private fun decodeSampledBitmapFromFile(filePath: String, reqWidth: Int, reqHeight: Int): Bitmap? {
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        BitmapFactory.decodeFile(filePath, options)
+
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
+        options.inJustDecodeBounds = false
+
+        return BitmapFactory.decodeFile(filePath, options)
+    }
+
+    /**
+     * 从资源解码Bitmap，使用采样避免内存过大
+     */
+    private fun decodeSampledBitmapFromResource(resId: Int, reqWidth: Int, reqHeight: Int): Bitmap? {
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        BitmapFactory.decodeResource(resources, resId, options)
+
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
+        options.inJustDecodeBounds = false
+
+        return BitmapFactory.decodeResource(resources, resId, options)
+    }
+
+    /**
+     * 计算采样大小
+     */
+    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        val height = options.outHeight
+        val width = options.outWidth
+        var inSampleSize = 1
+
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight = height / 2
+            val halfWidth = width / 2
+
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+
+        return inSampleSize
     }
 
     /**
      * 设置所有事件监听器
      */
     private fun setupListeners() {
-        // 取消按钮 - 取消裁剪并返回
+        // 取消按钮
         btnCancel.setOnClickListener {
             setResult(RESULT_CANCELED)
             finish()
         }
 
-        // 还原按钮 - 重置到原始状态
+        // 还原按钮
         btnReset.setOnClickListener {
             resetToOriginal()
         }
 
-        // 完成按钮 - 执行裁剪并返回结果
+        // 完成按钮
         btnDone.setOnClickListener {
             performCrop()
         }
 
-        // ========== 比例按钮监听器设置 ==========
+        // 功能标签点击监听
+        tabCrop.setOnClickListener {
+            switchToCropMode()
+        }
+
+        tabRotate.setOnClickListener {
+            switchToRotateMode()
+        }
+
+        // 裁剪比例按钮监听
+        setupCropListeners()
+
+        // 旋转按钮监听（使用防抖处理）
+        setupRotateListeners()
+    }
+
+    /**
+     * 设置裁剪比例按钮监听器
+     */
+    private fun setupCropListeners() {
         val ratioButtons = listOf(
-            Pair(btnFree, 0f),      // 自由比例
-            Pair(btn1_1, 1f),       // 1:1 正方形
-            Pair(btn4_3, 4f/3f),    // 4:3 横屏
-            Pair(btn3_4, 3f/4f),    // 3:4 竖屏
-            Pair(btn16_9, 16f/9f),  // 16:9 宽屏
-            Pair(btn9_16, 9f/16f)   // 9:16 手机竖屏
+            Pair(btnFree, 0f),
+            Pair(btn1_1, 1f),
+            Pair(btn4_3, 4f/3f),
+            Pair(btn3_4, 3f/4f),
+            Pair(btn16_9, 16f/9f),
+            Pair(btn9_16, 9f/16f)
         )
 
-        // 为每个按钮设置点击监听器
         ratioButtons.forEach { (button, ratio) ->
             button.setOnClickListener {
                 selectRatio(ratio)
             }
         }
+    }
 
-        // ========== 裁剪框变化监听器 ==========
-        // 注意：这里移除了updateCropPreview的调用，因为不需要实时预览
-        cropOverlayView.setOnCropChangeListener(object : CropOverlayView.OnCropChangeListener {
-            override fun onCropChanged(cropRect: RectF) {
-                // 不需要实时预览，所以这里什么都不做
-                // 或者可以添加一些简单的日志
-                // Log.d("Crop", "裁剪框变化: $cropRect")
+    /**
+     * 设置旋转按钮监听器（添加防抖处理）
+     */
+    private fun setupRotateListeners() {
+        // 顺时针旋转（防抖处理）
+        btnRotateClockwise.setOnClickListener {
+            if (!isTransforming) {
+                rotateClockwise90()
             }
-        })
+        }
+
+        // 逆时针旋转（防抖处理）
+        btnRotateCounterClockwise.setOnClickListener {
+            if (!isTransforming) {
+                rotateCounterClockwise90()
+            }
+        }
+
+        // 180°旋转（防抖处理）
+        btnRotate180.setOnClickListener {
+            if (!isTransforming) {
+                rotate180()
+            }
+        }
+
+        // 水平翻转（防抖处理）
+        btnFlipHorizontal.setOnClickListener {
+            if (!isTransforming) {
+                flipHorizontal()
+            }
+        }
+
+        // 垂直翻转（防抖处理）
+        btnFlipVertical.setOnClickListener {
+            if (!isTransforming) {
+                flipVertical()
+            }
+        }
+    }
+
+    /**
+     * 切换到裁剪模式
+     */
+    private fun switchToCropMode() {
+        isCropMode = true
+        tvTitle.text = "编辑图片 - 裁剪"
+
+        // 更新标签状态
+        tabCrop.isSelected = true
+        tabRotate.isSelected = false
+        updateTabColors()
+
+        // 显示裁剪界面，隐藏旋转界面
+        layoutCrop.visibility = View.VISIBLE
+        layoutRotate.visibility = View.GONE
+
+        // 显示裁剪框
+        cropOverlayView.setShowCropRect(true)
+
+        // 显示还原按钮
+        btnReset.visibility = View.VISIBLE
+    }
+
+    /**
+     * 切换到旋转模式
+     */
+    private fun switchToRotateMode() {
+        isCropMode = false
+        tvTitle.text = "编辑图片 - 旋转"
+
+        // 更新标签状态
+        tabCrop.isSelected = false
+        tabRotate.isSelected = true
+        updateTabColors()
+
+        // 显示旋转界面，隐藏裁剪界面
+        layoutCrop.visibility = View.GONE
+        layoutRotate.visibility = View.VISIBLE
+
+        // 隐藏裁剪框
+        cropOverlayView.setShowCropRect(false)
+
+        // 显示还原按钮
+        btnReset.visibility = View.VISIBLE
+
+        // 更新状态文本
+        updateStatusText()
+    }
+
+    /**
+     * 更新标签颜色
+     */
+    private fun updateTabColors() {
+        if (tabCrop.isSelected) {
+            tabCrop.setTextColor(getColor(android.R.color.white))
+            tabRotate.setTextColor(getColor(android.R.color.darker_gray))
+        } else {
+            tabCrop.setTextColor(getColor(android.R.color.darker_gray))
+            tabRotate.setTextColor(getColor(android.R.color.white))
+        }
     }
 
     /**
      * 选择裁剪比例
-     * @param ratio 比例值，0表示自由比例
      */
     private fun selectRatio(ratio: Float) {
-        currentRatio = ratio
-
-        // 定义所有比例按钮及其对应的比例值
         val buttons = listOf(
             Pair(btnFree, 0f),
             Pair(btn1_1, 1f),
@@ -183,83 +390,298 @@ class NewCropActivity : AppCompatActivity() {
             Pair(btn9_16, 9f/16f)
         )
 
-        // 更新按钮选中状态
         buttons.forEach { (button, buttonRatio) ->
             button.isSelected = (buttonRatio == ratio)
         }
 
-        // 设置裁剪框比例
         cropOverlayView.setCropRatio(ratio)
+    }
 
-        // 显示还原按钮
-        btnReset.visibility = View.VISIBLE
+    /**
+     * 顺时针旋转90°（安全版本）
+     */
+    private fun rotateClockwise90() {
+        if (isTransforming) return
+
+        isTransforming = true
+        try {
+            currentRotation = (currentRotation - 90) % 360
+            if (currentRotation < 0) currentRotation += 360
+
+            safeApplyTransformations()
+            updateStatusText()
+
+            Toast.makeText(this, "顺时针旋转90°", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "旋转失败", Toast.LENGTH_SHORT).show()
+        } finally {
+            isTransforming = false
+        }
+    }
+
+    /**
+     * 逆时针旋转90°（安全版本）
+     */
+    private fun rotateCounterClockwise90() {
+        if (isTransforming) return
+
+        isTransforming = true
+        try {
+            currentRotation = (currentRotation + 90) % 360
+
+            safeApplyTransformations()
+            updateStatusText()
+
+            Toast.makeText(this, "逆时针旋转90°", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "旋转失败", Toast.LENGTH_SHORT).show()
+        } finally {
+            isTransforming = false
+        }
+    }
+
+    /**
+     * 旋转180°（安全版本）
+     */
+    private fun rotate180() {
+        if (isTransforming) return
+
+        isTransforming = true
+        try {
+            currentRotation = (currentRotation + 180) % 360
+
+            safeApplyTransformations()
+            updateStatusText()
+
+            Toast.makeText(this, "旋转180°", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "旋转失败", Toast.LENGTH_SHORT).show()
+        } finally {
+            isTransforming = false
+        }
+    }
+
+    /**
+     * 水平翻转（安全版本）
+     */
+    private fun flipHorizontal() {
+        if (isTransforming) return
+
+        isTransforming = true
+        try {
+            isHorizontalFlipped = !isHorizontalFlipped
+
+            safeApplyTransformations()
+            updateStatusText()
+
+            val status = if (isHorizontalFlipped) "水平翻转" else "取消水平翻转"
+            Toast.makeText(this, status, Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "翻转失败", Toast.LENGTH_SHORT).show()
+        } finally {
+            isTransforming = false
+        }
+    }
+
+    /**
+     * 垂直翻转（安全版本）
+     */
+    private fun flipVertical() {
+        if (isTransforming) return
+
+        isTransforming = true
+        try {
+            isVerticalFlipped = !isVerticalFlipped
+
+            safeApplyTransformations()
+            updateStatusText()
+
+            val status = if (isVerticalFlipped) "垂直翻转" else "取消垂直翻转"
+            Toast.makeText(this, status, Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "翻转失败", Toast.LENGTH_SHORT).show()
+        } finally {
+            isTransforming = false
+        }
+    }
+
+    /**
+     * 重置所有变换
+     */
+    private fun resetAllTransformations() {
+        if (isTransforming) return
+
+        isTransforming = true
+        try {
+            currentRotation = 0f
+            isHorizontalFlipped = false
+            isVerticalFlipped = false
+
+            safeApplyTransformations()
+            updateStatusText()
+
+            Toast.makeText(this, "已重置所有变换", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "重置失败", Toast.LENGTH_SHORT).show()
+        } finally {
+            isTransforming = false
+        }
     }
 
     /**
      * 重置到原始状态
      */
     private fun resetToOriginal() {
-        // 重置裁剪框
-        cropOverlayView.resetCropRect()
-
-        // 重置比例选择
-        selectRatio(0f)
-
-        // 隐藏还原按钮
-        btnReset.visibility = View.GONE
-
-        Toast.makeText(this, "已还原到原始状态", Toast.LENGTH_SHORT).show()
+        if (isCropMode) {
+            // 裁剪模式：重置裁剪框
+            cropOverlayView.resetCropRect()
+            selectRatio(0f)
+            Toast.makeText(this, "裁剪框已重置", Toast.LENGTH_SHORT).show()
+        } else {
+            // 旋转模式：重置所有变换
+            resetAllTransformations()
+        }
     }
 
     /**
-     * 执行裁剪操作 - 简化版本
+     * 更新状态文本
+     */
+    private fun updateStatusText() {
+        val rotationText = when (currentRotation) {
+            0f -> "0°"
+            90f -> "90°"
+            180f -> "180°"
+            270f -> "270°"
+            else -> "${currentRotation.toInt()}°"
+        }
+
+        val horizontalText = if (isHorizontalFlipped) "水平: 镜像" else "水平: 正常"
+        val verticalText = if (isVerticalFlipped) "垂直: 镜像" else "垂直: 正常"
+
+        tvRotateStatus.text = "状态: 旋转$rotationText | $horizontalText | $verticalText"
+    }
+
+    /**
+     * 安全的应用变换（避免内存问题和并发问题）
+     */
+    private fun safeApplyTransformations() {
+        if (originalBitmap == null) return
+
+        try {
+            // 重置变换矩阵
+            transformMatrix.reset()
+
+            // 计算图片中心点
+            val centerX = originalBitmap!!.width / 2f
+            val centerY = originalBitmap!!.height / 2f
+
+            // 1. 平移至中心点
+            transformMatrix.postTranslate(-centerX, -centerY)
+
+            // 2. 应用旋转
+            if (currentRotation != 0f) {
+                transformMatrix.postRotate(currentRotation)
+            }
+
+            // 3. 应用翻转（镜像）
+            var scaleX = 1f
+            var scaleY = 1f
+
+            if (isHorizontalFlipped) {
+                scaleX = -1f  // 水平镜像
+            }
+
+            if (isVerticalFlipped) {
+                scaleY = -1f  // 垂直镜像
+            }
+
+            // 注意：翻转需要在旋转之后应用，以达到正确的镜像效果
+            if (scaleX != 1f || scaleY != 1f) {
+                transformMatrix.postScale(scaleX, scaleY)
+            }
+
+            // 4. 平移回原位置
+            transformMatrix.postTranslate(centerX, centerY)
+
+            // 回收旧的Bitmap
+            transformedBitmap?.recycle()
+
+            // 创建变换后的Bitmap
+            transformedBitmap = Bitmap.createBitmap(
+                originalBitmap!!,
+                0, 0,
+                originalBitmap!!.width, originalBitmap!!.height,
+                transformMatrix,
+                true
+            )
+
+            // 显示变换后的图片
+            runOnUiThread {
+                updateImageDisplay()
+            }
+
+        } catch (e: OutOfMemoryError) {
+            // 内存不足，尝试回收内存
+            System.gc()
+            Toast.makeText(this, "内存不足，请稍后再试", Toast.LENGTH_SHORT).show()
+            throw e
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+
+    /**
+     * 更新图片显示
+     */
+    private fun updateImageDisplay() {
+        if (transformedBitmap != null && !transformedBitmap!!.isRecycled) {
+            cropImageView.setImageBitmap(transformedBitmap)
+            cropImageView.resetZoom()
+        }
+    }
+
+    /**
+     * 执行裁剪操作
      */
     private fun performCrop() {
-        // 直接使用Glide加载的Bitmap进行裁剪
-        val drawable = cropImageView.drawable ?: run {
+        if (transformedBitmap == null || transformedBitmap!!.isRecycled) {
             Toast.makeText(this, "图片未加载", Toast.LENGTH_SHORT).show()
             return
         }
 
         try {
-            // 1. 获取裁剪区域（相对于裁剪框视图的坐标）
-            val cropRect = cropOverlayView.getCropRect()
+            var resultBitmap = transformedBitmap!!
 
-            // 2. 获取图片显示区域
-            val imageRect = getImageDisplayRect(drawable)
-            if (imageRect.width() <= 0 || imageRect.height() <= 0) {
-                Toast.makeText(this, "无法获取图片显示区域", Toast.LENGTH_SHORT).show()
-                return
+            // 如果是在裁剪模式，应用裁剪
+            if (isCropMode) {
+                resultBitmap = applyCrop(resultBitmap)
             }
 
-            // 3. 获取ImageView中的Bitmap
-            val bitmap = getBitmapFromDrawable(drawable)
-            if (bitmap == null) {
-                Toast.makeText(this, "无法获取图片数据", Toast.LENGTH_SHORT).show()
-                return
-            }
-
-            // 4. 将裁剪框坐标转换为图片坐标
-            val cropRectInImage = convertCropRectToImageCoordinates(cropRect, imageRect, bitmap)
-
-            // 5. 创建裁剪后的Bitmap
-            val croppedBitmap = Bitmap.createBitmap(
-                bitmap,
-                cropRectInImage.left.toInt(),
-                cropRectInImage.top.toInt(),
-                cropRectInImage.width().toInt(),
-                cropRectInImage.height().toInt()
-            )
-
-            // 6. 保存裁剪后的图片
-            val savedPath = saveCroppedImage(croppedBitmap)
+            // 使用ImageManager保存图片到用户图片目录
+            val savedPath = ImageManager.saveUserImage(this, resultBitmap, "编辑后的图片")
 
             if (savedPath != null) {
-                // 7. 返回结果
+                // 显示保存位置信息
+                val file = File(savedPath)
+                val fileSize = String.format("%.1f", file.length() / 1024.0 / 1024.0)
+
                 val result = Intent().apply {
                     putExtra("cropped_image_path", savedPath)
+                    putExtra("is_user_created", true) // 标记为用户创建的图片
                 }
                 setResult(RESULT_OK, result)
+
+                Toast.makeText(this,
+                    "保存成功！\n位置: ${file.parentFile?.name}\n大小: ${fileSize}MB",
+                    Toast.LENGTH_LONG).show()
+
                 finish()
             } else {
                 Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show()
@@ -267,32 +689,35 @@ class NewCropActivity : AppCompatActivity() {
 
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "裁剪失败: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "处理失败: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
     /**
-     * 从Drawable获取Bitmap
+     * 应用裁剪到Bitmap
      */
-    private fun getBitmapFromDrawable(drawable: android.graphics.drawable.Drawable): Bitmap? {
-        return if (drawable is android.graphics.drawable.BitmapDrawable) {
-            drawable.bitmap
-        } else {
-            // 如果不是BitmapDrawable，创建一个新的Bitmap
-            val bitmap = Bitmap.createBitmap(
-                drawable.intrinsicWidth,
-                drawable.intrinsicHeight,
-                Bitmap.Config.ARGB_8888
-            )
-            val canvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, canvas.width, canvas.height)
-            drawable.draw(canvas)
-            bitmap
+    private fun applyCrop(bitmap: Bitmap): Bitmap {
+        val cropRect = cropOverlayView.getCropRect()
+        val drawable = cropImageView.drawable ?: return bitmap
+
+        val imageRect = getImageDisplayRect(drawable)
+        if (imageRect.width() <= 0 || imageRect.height() <= 0) {
+            return bitmap
         }
+
+        val cropRectInImage = convertCropRectToImageCoordinates(cropRect, imageRect, bitmap)
+
+        return Bitmap.createBitmap(
+            bitmap,
+            cropRectInImage.left.toInt(),
+            cropRectInImage.top.toInt(),
+            cropRectInImage.width().toInt(),
+            cropRectInImage.height().toInt()
+        )
     }
 
     /**
-     * 获取图片在ImageView中的显示区域
+     * 获取图片显示区域
      */
     private fun getImageDisplayRect(drawable: android.graphics.drawable.Drawable): RectF {
         val matrix = cropImageView.imageMatrix
@@ -308,18 +733,16 @@ class NewCropActivity : AppCompatActivity() {
     }
 
     /**
-     * 将裁剪框坐标转换为图片坐标
+     * 转换裁剪框坐标
      */
     private fun convertCropRectToImageCoordinates(
         cropRectInOverlay: RectF,
         imageRect: RectF,
         bitmap: Bitmap
     ): RectF {
-        // 计算转换比例
         val scaleX = bitmap.width.toFloat() / imageRect.width()
         val scaleY = bitmap.height.toFloat() / imageRect.height()
 
-        // 转换坐标
         val cropRectInImage = RectF(
             (cropRectInOverlay.left - imageRect.left) * scaleX,
             (cropRectInOverlay.top - imageRect.top) * scaleY,
@@ -327,7 +750,6 @@ class NewCropActivity : AppCompatActivity() {
             (cropRectInOverlay.bottom - imageRect.top) * scaleY
         )
 
-        // 边界检查
         cropRectInImage.left = max(0f, cropRectInImage.left)
         cropRectInImage.top = max(0f, cropRectInImage.top)
         cropRectInImage.right = min(bitmap.width.toFloat(), cropRectInImage.right)
@@ -337,30 +759,22 @@ class NewCropActivity : AppCompatActivity() {
     }
 
     /**
-     * 保存裁剪后的Bitmap到文件
+     * 保存图片到文件
      */
     private fun saveCroppedImage(bitmap: Bitmap): String? {
         return try {
-            // 创建时间戳文件名
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val fileName = "cropped_${timeStamp}.jpg"
+            val fileName = "edited_${timeStamp}.jpg"
 
-            // 保存到应用私有目录
             val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            if (storageDir == null || !storageDir.exists()) {
-                storageDir?.mkdirs()
-            }
+            storageDir?.mkdirs()
 
             val imageFile = File(storageDir, fileName)
 
-            // 保存Bitmap（使用90%质量，兼顾质量和文件大小）
             FileOutputStream(imageFile).use { outputStream ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
                 outputStream.flush()
             }
-
-            // 释放Bitmap内存
-            bitmap.recycle()
 
             imageFile.absolutePath
 
@@ -374,6 +788,8 @@ class NewCropActivity : AppCompatActivity() {
         super.onDestroy()
         // 清理资源
         originalBitmap?.recycle()
+        transformedBitmap?.recycle()
         originalBitmap = null
+        transformedBitmap = null
     }
 }

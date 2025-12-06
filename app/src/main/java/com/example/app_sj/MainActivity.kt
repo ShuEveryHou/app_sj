@@ -2,6 +2,8 @@ package com.example.app_sj
 
 import android.os.Bundle
 import android.content.Intent
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 
@@ -43,6 +45,19 @@ class MainActivity : AppCompatActivity() {
         btnCameraTest.setOnClickListener {
             navigateToCameraTest()
         }
+    }
+
+    // 可以添加一个菜单或按钮来清理用户图片
+    fun clearUserImages() {
+        AlertDialog.Builder(this)
+            .setTitle("清理用户图片")
+            .setMessage("确定要删除所有用户创建的图片吗？")
+            .setPositiveButton("确定") { _, _ ->
+                ImageManager.clearAllUserImages(this)
+                Toast.makeText(this, "用户图片已清理", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("取消", null)
+            .show()
     }
 
     //摄像头测试函数

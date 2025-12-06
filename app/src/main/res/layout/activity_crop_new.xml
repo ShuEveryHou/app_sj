@@ -25,8 +25,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <!-- 删除cropPreview ImageView，因为不需要实时预览 -->
-
     </FrameLayout>
 
     <!-- 顶部工具栏 -->
@@ -51,6 +49,7 @@
 
         <!-- 标题 -->
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -94,6 +93,7 @@
 
         <!-- 功能选择标签 -->
         <LinearLayout
+            android:id="@+id/tabContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -110,9 +110,9 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="12dp"
-                android:background="#40000000" />
+                android:background="@drawable/btn_tab_selector" />
 
-            <!-- 旋转标签（占位，后续实现） -->
+            <!-- 旋转标签 -->
             <TextView
                 android:id="@+id/tabRotate"
                 android:layout_width="0dp"
@@ -122,100 +122,222 @@
                 android:textColor="#80FFFFFF"
                 android:textSize="16sp"
                 android:gravity="center"
-                android:padding="12dp" />
+                android:padding="12dp"
+                android:background="@drawable/btn_tab_selector" />
 
         </LinearLayout>
 
-        <!-- 比例选择区域 - 使用HorizontalScrollView包装 -->
-        <HorizontalScrollView
-            android:id="@+id/scrollRatioContainer"
+        <!-- 裁剪界面 -->
+        <LinearLayout
+            android:id="@+id/layoutCrop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:scrollbars="none"
-            android:fillViewport="true">
+            android:orientation="vertical"
+            android:visibility="visible">
 
-            <LinearLayout
-                android:id="@+id/ratioContainer"
-                android:layout_width="wrap_content"
+            <!-- 比例选择区域 - 使用HorizontalScrollView包装 -->
+            <HorizontalScrollView
+                android:id="@+id/scrollRatioContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_marginTop="12dp"
+                android:scrollbars="none"
+                android:fillViewport="true">
 
-                <!-- 自由比例 -->
-                <Button
-                    android:id="@+id/btnFree"
+                <LinearLayout
+                    android:id="@+id/ratioContainer"
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:minWidth="80dp"
-                    android:text="自由"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/btn_ratio_selector"
-                    android:textAllCaps="false"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <!-- 1:1 比例 -->
-                <Button
-                    android:id="@+id/btn1_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:minWidth="80dp"
-                    android:text="1:1"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/btn_ratio_selector"
-                    android:textAllCaps="false"
-                    android:layout_marginEnd="8dp" />
+                    <!-- 自由比例 -->
+                    <Button
+                        android:id="@+id/btnFree"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:minWidth="80dp"
+                        android:text="自由"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_ratio_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
 
-                <!-- 4:3 比例 -->
-                <Button
-                    android:id="@+id/btn4_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:minWidth="80dp"
-                    android:text="4:3"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/btn_ratio_selector"
-                    android:textAllCaps="false"
-                    android:layout_marginEnd="8dp" />
+                    <!-- 1:1 比例 -->
+                    <Button
+                        android:id="@+id/btn1_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:minWidth="80dp"
+                        android:text="1:1"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_ratio_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
 
-                <!-- 3:4 比例 -->
-                <Button
-                    android:id="@+id/btn3_4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:minWidth="80dp"
-                    android:text="3:4"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/btn_ratio_selector"
-                    android:textAllCaps="false"
-                    android:layout_marginEnd="8dp" />
+                    <!-- 4:3 比例 -->
+                    <Button
+                        android:id="@+id/btn4_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:minWidth="80dp"
+                        android:text="4:3"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_ratio_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
 
-                <!-- 16:9 比例 -->
-                <Button
-                    android:id="@+id/btn16_9"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:minWidth="80dp"
-                    android:text="16:9"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/btn_ratio_selector"
-                    android:textAllCaps="false"
-                    android:layout_marginEnd="8dp" />
+                    <!-- 3:4 比例 -->
+                    <Button
+                        android:id="@+id/btn3_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:minWidth="80dp"
+                        android:text="3:4"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_ratio_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
 
-                <!-- 9:16 比例 -->
-                <Button
-                    android:id="@+id/btn9_16"
+                    <!-- 16:9 比例 -->
+                    <Button
+                        android:id="@+id/btn16_9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:minWidth="80dp"
+                        android:text="16:9"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_ratio_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- 9:16 比例 -->
+                    <Button
+                        android:id="@+id/btn9_16"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:minWidth="80dp"
+                        android:text="9:16"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_ratio_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
+        <!-- 旋转界面 -->
+        <LinearLayout
+            android:id="@+id/layoutRotate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginTop="12dp">
+
+            <!-- 操作按钮水平滑动容器 -->
+            <HorizontalScrollView
+                android:id="@+id/scrollRotateOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:fillViewport="true"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:id="@+id/rotateOptionsContainer"
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:minWidth="80dp"
-                    android:text="9:16"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="8dp">
+
+                    <!-- 顺时针旋转 -->
+                    <Button
+                        android:id="@+id/btnRotateClockwise"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:minWidth="100dp"
+                        android:text="↻ 顺时针"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_rotate_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- 逆时针旋转 -->
+                    <Button
+                        android:id="@+id/btnRotateCounterClockwise"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:minWidth="100dp"
+                        android:text="↺ 逆时针"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_rotate_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- 180°旋转 -->
+                    <Button
+                        android:id="@+id/btnRotate180"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:minWidth="80dp"
+                        android:text="180°"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_rotate_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- 水平翻转 -->
+                    <Button
+                        android:id="@+id/btnFlipHorizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:minWidth="100dp"
+                        android:text="⇄ 水平"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_flip_selector"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- 垂直翻转 -->
+                    <Button
+                        android:id="@+id/btnFlipVertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:minWidth="100dp"
+                        android:text="⇅ 垂直"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_flip_selector"
+                        android:textAllCaps="false" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- 当前状态显示 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:background="#20000000"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/tvRotateStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="状态: 旋转0° | 水平: 正常 | 垂直: 正常"
                     android:textColor="@android:color/white"
-                    android:background="@drawable/btn_ratio_selector"
-                    android:textAllCaps="false"
-                    android:layout_marginEnd="8dp" />
+                    android:textSize="14sp"
+                    android:gravity="center" />
 
             </LinearLayout>
-        </HorizontalScrollView>
+
+        </LinearLayout>
 
     </LinearLayout>
 

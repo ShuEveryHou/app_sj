@@ -6,6 +6,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import java.io.File
 
 //显示图片列表
 class PhotoAdapter(
@@ -29,19 +32,36 @@ class PhotoAdapter(
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val photo = photos[position]
 
-        //直接使用资源ID加载图片资源
-        Glide.with(holder.itemView.context)
-            .load(photo.getDisplayPath())
+        // 创建Glide配置
+        val requestOptions = RequestOptions()
             .centerCrop()
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .placeholder(R.drawable.placeholder_image)
-            .into(holder.ivPhoto)
+            .error(android.R.drawable.ic_menu_camera)
 
-        //设置点击事件
+        // 根据图片来源选择加载方式
+        if (photo.isUserCreated && photo.filePath.isNotEmpty()) {
+            // 用户创建的图片：从文件路径加载
+            Glide.with(holder.itemView.context)
+                .load(File(photo.filePath))
+                .apply(requestOptions)
+                .into(holder.ivPhoto)
+        } else if (photo.resourceId != 0) {
+            // 系统图片：从资源ID加载
+            Glide.with(holder.itemView.context)
+                .load(photo.resourceId)
+                .apply(requestOptions)
+                .into(holder.ivPhoto)
+        } else {
+            // 默认图标
+            holder.ivPhoto.setImageResource(android.R.drawable.ic_menu_camera)
+        }
+
+        // 设置点击事件
         holder.ivPhoto.setOnClickListener {
             onItemClick(photo)
         }
     }
-
     // 返回项目数量
     override fun getItemCount(): Int = photos.size
 

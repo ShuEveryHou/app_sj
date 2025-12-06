@@ -6,15 +6,18 @@ data class Photo(
     val resourceId: Int = 0,
     val filePath: String = "",
     val title: String = "",
-    val isFromCamera: Boolean = false
+    val isFromCamera: Boolean = false,
+    val isUserCreated: Boolean = false // 新增：标记是否为用户创建的图片
 ) {
     fun getDisplayPath(): Any {
-        // 如果有文件路径，优先使用文件路径
-        // 否则使用资源ID
         return if (filePath.isNotEmpty()) {
             filePath
         } else {
-            resourceId  // 直接返回资源ID，Glide可以处理
+            resourceId
         }
+    }
+
+    fun getDisplayName(): String {
+        return if (title.isNotEmpty()) title else "图片_$id"
     }
 }

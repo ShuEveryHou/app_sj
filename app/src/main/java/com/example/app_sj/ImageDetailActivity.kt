@@ -213,8 +213,7 @@ class ImageDetailActivity: AppCompatActivity() {
             Toast.makeText(this, "无法启动裁剪: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-
-    // ========== 其他原有方法保持不变 ==========
+    
 
     private fun loadImageData() {
         currentPhotoId = intent.getIntExtra("photo_id", 0)
@@ -223,11 +222,15 @@ class ImageDetailActivity: AppCompatActivity() {
         currentPhotoTitle = intent.getStringExtra("photo_title") ?: "未命名图片"
         isFromCamera = intent.getBooleanExtra("is_from_camera", false)
 
+        // 检查是否为用户创建的图片
+        val isUserCreated = intent.getBooleanExtra("is_user_created", false)
+
         // 设置照片信息文本
-        tvPhotoInfo.text = "${currentPhotoTitle} (ID: ${currentPhotoId})"
+        val sourceText = if (isUserCreated) "用户图片" else "系统图片"
+        tvPhotoInfo.text = "${currentPhotoTitle} (ID: ${currentPhotoId}, 来源: ${sourceText})"
 
         // 加载图片
-        loadImageFast(currentResourceId, currentFilePath, isFromCamera)
+        loadImageFast(currentResourceId, currentFilePath, isFromCamera || isUserCreated)
     }
 
     private fun loadImageFast(resourceId: Int, filePath: String, isFromCamera: Boolean) {

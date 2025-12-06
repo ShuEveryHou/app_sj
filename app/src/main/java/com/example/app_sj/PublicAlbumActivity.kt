@@ -4,6 +4,7 @@ package com.example.app_sj
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -69,71 +70,83 @@ class PublicAlbumActivity : AppCompatActivity() {
      */
     private fun loadSamplePhotos() {
         val samplePhotos = mutableListOf<Photo>()
-        // 清空资源ID列表
-        photoResourceIds.clear()
 
-        // 本地图片数据（匹配您drawable目录中的文件名）
+        // 1. 首先加载系统图片（原有的本地图片）
+        fun getResourceId(name: String): Int {
+            return resources.getIdentifier(name, "drawable", packageName)
+        }
+
         val imageData = listOf(
-            "bao_1" to "图1",
-            "bao_2" to "图2",
-            "bao_3" to "图3",
-            "bao_4" to "图4",
-            "bao_5" to "图5",
-            "bao_6" to "图6",
-            "bao_7" to "图7",
-            "bao_8" to "图8",
-            "bao_9" to "图9",
-            "bao_10" to "图10",
-            "bao_11" to "图11",
-            "bao_12" to "图12",
-            "bao_13" to "图13",
-            "bao_14" to "图14",
-            "pic_1" to "图15",
-            "pic_2" to "图16",
-            "pic_3" to "图17",
-            "pic_4" to "图18",
-            "pic_5" to "图19",
-            "pic_6" to "图20",
-            "pic_7" to "图21",
-            "pic_8" to "图22",
-            "pic_9" to "图23",
-            "pic_10" to "图24",
-            "pic_11" to "图25",
-            "pic_12" to "图26",
-            "pic_13" to "图27",
-            "pic_14" to "图28",
-            "pic_15" to "图29",
-            "pic_16" to "图30"
+            Pair("bao_1","图1"),
+            Pair("bao_2","图2"),
+            Pair("bao_3","图3"),
+            Pair("bao_4","图4"),
+            Pair("bao_5","图5"),
+            Pair("bao_6","图6"),
+            Pair("bao_7","图7"),
+            Pair("bao_8","图8"),
+            Pair("bao_9","图9"),
+            Pair("bao_10","图10"),
+            Pair("bao_11","图11"),
+            Pair("bao_12","图12"),
+            Pair("bao_13","图13"),
+            Pair("bao_14","图14"),
+            Pair("pic_1","图15"),
+            Pair("pic_2","图16"),
+            Pair("pic_3","图17"),
+            Pair("pic_4","图18"),
+            Pair("pic_5","图19"),
+            Pair("pic_6","图20"),
+            Pair("pic_7","图21"),
+            Pair("pic_8","图22"),
+            Pair("pic_9","图23"),
+            Pair("pic_10","图24"),
+            Pair("pic_11","图25"),
+            Pair("pic_12","图26"),
+            Pair("pic_13","图27"),
+            Pair("pic_14","图28"),
+            Pair("pic_15","图29"),
+            Pair("pic_16","图30"),
         )
 
         for ((index, data) in imageData.withIndex()) {
             val (imageName, title) = data
-
-            // 获取资源ID
             val resourceId = getResourceId(imageName)
 
             if (resourceId != 0) {
-                // 资源存在，添加到列表
-                val photo = Photo(index + 1, resourceId, "", title, false)
-                samplePhotos.add(photo)
-                photoResourceIds.add(resourceId)
-
-                // 打印调试信息
-                Log.d("PublicAlbum", "找到图片: $imageName -> $resourceId")
+                samplePhotos.add(Photo(index + 1, resourceId, "", title, false, false))
             } else {
-                // 资源不存在，使用默认图标
-                Log.w("PublicAlbum", "未找到图片: $imageName，使用默认图标")
-                samplePhotos.add(Photo(index + 1, android.R.drawable.ic_menu_camera, "", "$title (默认)", false))
+                samplePhotos.add(Photo(index + 1, android.R.drawable.ic_menu_camera, "", "$title (默认)", false, false))
             }
         }
 
-        // 更新适配器数据
+        // 2. 加载用户创建的图片（追加到列表末尾）
+        val userPhotos = ImageManager.getUserImages(this)
+        val userStartId = samplePhotos.size + 1
+
+        userPhotos.forEachIndexed { index, photo ->
+            // 重新分配ID，避免冲突
+            val newPhoto = Photo(
+                id = userStartId + index,
+                resourceId = 0,
+                filePath = photo.filePath,
+                title = photo.title,
+                isFromCamera = false,
+                isUserCreated = true
+            )
+            samplePhotos.add(newPhoto)
+        }
+
+        // 3. 更新适配器数据
         photoAdapter.updatePhotos(samplePhotos)
 
-        // 打印统计信息
-        Log.i("PublicAlbum", "成功加载 ${samplePhotos.size} 张图片，其中 ${photoResourceIds.size} 张是本地图片")
+        // 4. 显示统计信息
+        val systemCount = imageData.size
+        val userCount = userPhotos.size
+        Toast.makeText(this,
+            "加载完成: ${systemCount}张系统图片 + ${userCount}张用户图片",
+            Toast.LENGTH_SHORT).show()
     }
-
     /**
      * 获取drawable资源ID
      */
