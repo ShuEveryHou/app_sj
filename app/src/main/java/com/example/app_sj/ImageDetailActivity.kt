@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -146,9 +147,48 @@ class ImageDetailActivity: AppCompatActivity() {
             Toast.makeText(this, "删除功能待实现", Toast.LENGTH_SHORT).show()
         }
 
-        // 文字按钮（暂不实现）
+        // 文字按钮
         btnText.setOnClickListener {
-            Toast.makeText(this, "文字功能待实现", Toast.LENGTH_SHORT).show()
+
+            Log.d("TextEdit", "点击文字按钮，当前图片ID: $currentPhotoId")
+            val photo = Photo(
+                id = currentPhotoId,
+                resourceId = currentResourceId,
+                filePath = currentFilePath,
+                title = currentPhotoTitle,
+                isFromCamera = isFromCamera,
+                isUserCreated = true // 假设是用户创建的图片
+            )
+
+            try {
+                TextEditActivity.startForResult(this@ImageDetailActivity, photo)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "启动失败: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+            // 启动文字编辑Activity
+            //TextEditActivity.startForResult(this, photo)
+        }
+    }
+
+    // 添加处理文字功能返回结果的方法
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK && data != null) {
+            val savedPath = data.getStringExtra("saved_image_path")
+            if (!savedPath.isNullOrEmpty()) {
+                // 重新加载图片显示
+                Glide.with(this)
+                    .load(File(savedPath))
+                    .into(ivDetail)
+
+                // 更新当前图片路径
+                currentFilePath = savedPath
+                isFromCamera = true
+
+                Toast.makeText(this, "文字添加完成", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
