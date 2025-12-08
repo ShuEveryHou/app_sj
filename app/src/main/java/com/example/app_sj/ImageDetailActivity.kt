@@ -142,9 +142,18 @@ class ImageDetailActivity: AppCompatActivity() {
             startNewCropActivity()
         }
 
-        // 删除按钮（暂不实现）
+        // 综合按钮
         btnDelete.setOnClickListener {
-            Toast.makeText(this, "删除功能待实现", Toast.LENGTH_SHORT).show()
+            val photo = Photo(
+                id = currentPhotoId,
+                resourceId = currentResourceId,
+                filePath = currentFilePath,
+                title = currentPhotoTitle,
+                isFromCamera = isFromCamera,
+                isUserCreated = true
+            )
+
+            ImageEnhanceActivity.startForResult(this, photo)
         }
 
         // 文字按钮
@@ -171,7 +180,7 @@ class ImageDetailActivity: AppCompatActivity() {
         }
     }
 
-    // 添加处理文字功能返回结果的方法
+    // 处理功能返回结果的方法
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -187,16 +196,12 @@ class ImageDetailActivity: AppCompatActivity() {
                 currentFilePath = savedPath
                 isFromCamera = true
 
-                Toast.makeText(this, "文字添加完成", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "图片处理完成", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     // ========== 裁剪功能相关 ==========
-
-    /**
-     * 启动新的裁剪Activity（不使用白色选择框）
-     */
     private fun startNewCropActivity() {
         val intent = Intent(this, NewCropActivity::class.java).apply {
             // 传递图片数据
