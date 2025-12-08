@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
 import java.io.File
+import kotlin.math.min
 
 class TextEditActivity : AppCompatActivity() {
 
@@ -29,7 +30,7 @@ class TextEditActivity : AppCompatActivity() {
     private lateinit var btnCancel: Button//文字取消按钮
     private lateinit var tvHint: TextView
     //调试按钮
-    private lateinit var btnDebug: Button
+    //private lateinit var btnDebug: Button
 
     // 控制面板
     private lateinit var panelAlpha: LinearLayout
@@ -135,6 +136,7 @@ class TextEditActivity : AppCompatActivity() {
         }
     }
 
+    //初始化
     private fun initViews() {
         ivBackground = findViewById(R.id.ivBackground)
         textOverlayContainer = findViewById(R.id.textOverlayContainer)
@@ -193,32 +195,7 @@ class TextEditActivity : AppCompatActivity() {
         updateFontButtons()
     }
 
-    /*private fun loadImageData() {
-        imagePath = intent.getStringExtra("photo_file_path")
-        resourceId = intent.getIntExtra("photo_resource_id", 0)
-        isFromCamera = intent.getBooleanExtra("is_from_camera", false)
-
-        if (isFromCamera && !imagePath.isNullOrEmpty()) {
-            Glide.with(this)
-                .load(File(imagePath))
-                .into(ivBackground)
-
-            scope.launch(Dispatchers.IO) {
-                loadBitmapFromFile(imagePath!!)
-            }
-        } else if (resourceId != 0) {
-            Glide.with(this)
-                .load(resourceId)
-                .into(ivBackground)
-
-            scope.launch(Dispatchers.IO) {
-                loadBitmapFromResource(resourceId)
-            }
-        } else {
-            Toast.makeText(this, "图片数据错误", Toast.LENGTH_SHORT).show()
-            finish()
-        }
-    }*/
+    //加载本地和用户空间的图片
     private fun loadImageData() {
         imagePath = intent.getStringExtra("photo_file_path")
         resourceId = intent.getIntExtra("photo_resource_id", 0)

@@ -28,7 +28,7 @@ class TextOverlayView(context: Context) : View(context) {
 
     private var fontType: String = "默认字体"
     private var textColor: Int = Color.BLACK
-    private var textAlpha: Int = 255  // 重命名以避免冲突
+    private var textAlpha: Int = 255
 
     private var posX: Float = 0f
     private var posY: Float = 0f
@@ -37,7 +37,7 @@ class TextOverlayView(context: Context) : View(context) {
     private var width: Float = 200f
     private var height: Float = 100f
 
-    private var isOverlaySelected: Boolean = false  // 重命名以避免混淆
+    private var isOverlaySelected: Boolean = false
     private var isDragging: Boolean = false
     private var isScaling: Boolean = false
     private var isRotating: Boolean = false

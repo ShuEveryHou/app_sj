@@ -59,7 +59,21 @@
         android:layout_marginBottom="50dp"
         />
 
-    <!--摄像头测试按钮（新增）-->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnTakePhoto"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:text="拍照"
+        android:textSize="18sp"
+        app:cornerRadius="12dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/guideline_horizontal"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@android:color/white" />
+
+    <!--摄像头测试按钮-->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCameraTest"
         android:layout_width="wrap_content"
