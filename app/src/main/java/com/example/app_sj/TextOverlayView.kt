@@ -5,6 +5,7 @@ import android.graphics.*
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import kotlin.math.*
@@ -411,19 +412,29 @@ class TextOverlayView(context: Context) : View(context) {
     fun drawTextOnCanvas(canvas: Canvas, imageWidth: Int, imageHeight: Int) {
         val paint = Paint(textPaint).apply {
             alpha = this@TextOverlayView.textAlpha
+            color = this@TextOverlayView.textColor
+            textSize = this@TextOverlayView.textPaint.textSize
+            typeface = this@TextOverlayView.textPaint.typeface
+            isAntiAlias = true
         }
 
-        val screenX = posX * imageWidth / width
-        val screenY = posY * imageHeight / height
+        // 更精确的坐标转换
+        val screenX = posX * imageWidth / resources.displayMetrics.widthPixels
+        val screenY = posY * imageHeight / resources.displayMetrics.heightPixels
+
+        Log.d("TextOverlay", "转换后位置: screenX=$screenX, screenY=$screenY")
 
         canvas.save()
         canvas.translate(screenX, screenY)
-        canvas.scale(scale, scale, width / 2, height / 2)
-        canvas.rotate(rotation, width / 2, height / 2)
+        canvas.scale(scale, scale)
+        canvas.rotate(rotation)
 
-        val textX = (width - paint.measureText(overlayText)) / 2
-        canvas.drawText(overlayText, textX, height / 2 + 10f, paint)
+        // 绘制文本 - 使用正确的基线
+        val textBounds = Rect()
+        paint.getTextBounds(overlayText, 0, overlayText.length, textBounds)
+        val textY = -textBounds.top  // 让文本在原点正确显示
 
+        canvas.drawText(overlayText, 0f, textY.toFloat(), paint)
         canvas.restore()
     }
 

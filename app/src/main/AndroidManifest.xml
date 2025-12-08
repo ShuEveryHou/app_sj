@@ -52,7 +52,6 @@
         <activity android:name=".PrivateAlbumActivity" android:exported="false"/>
         <activity android:name=".ImageDetailActivity" android:exported="false"/>
         <activity android:name=".CameraTestActivity" android:exported="false"/>
-        <activity android:name=".ImageCropActivity" android:exported="false"/>
         <activity android:name=".NewCropActivity" android:exported="false"/>
         <activity android:name=".TextEditActivity" android:exported="false"/>
         <activity android:name=".ImageEnhanceActivity" android:exported="false"/>

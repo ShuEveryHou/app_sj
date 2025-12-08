@@ -28,6 +28,8 @@ class TextEditActivity : AppCompatActivity() {
     private lateinit var btnSave: Button//文字保存按钮
     private lateinit var btnCancel: Button//文字取消按钮
     private lateinit var tvHint: TextView
+    //调试按钮
+    private lateinit var btnDebug: Button
 
     // 控制面板
     private lateinit var panelAlpha: LinearLayout
@@ -174,6 +176,9 @@ class TextEditActivity : AppCompatActivity() {
         tvBlueValue = findViewById(R.id.tvBlueValue)
         colorPreview = findViewById(R.id.colorPreview)
         tvHexColor = findViewById(R.id.tvHexColor)
+
+        //调试按钮
+        //btnDebug = findViewById(R.id.btnDebug)
     }
 
     private fun setupPanels() {
@@ -218,7 +223,7 @@ class TextEditActivity : AppCompatActivity() {
         imagePath = intent.getStringExtra("photo_file_path")
         resourceId = intent.getIntExtra("photo_resource_id", 0)
         isFromCamera = intent.getBooleanExtra("is_from_camera", false)
-        isUserCreated = intent.getBooleanExtra("is_user_created", false)  // 添加这行
+        isUserCreated = intent.getBooleanExtra("is_user_created", false)
 
         Log.d("TextEdit", "加载图片数据: path=$imagePath, resourceId=$resourceId, isUserCreated=$isUserCreated")
 
