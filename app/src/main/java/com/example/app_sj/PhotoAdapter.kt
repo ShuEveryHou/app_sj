@@ -7,17 +7,15 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import java.io.File
 
-//显示图片列表
 class PhotoAdapter(
     private var photos: List<Photo> = emptyList(),
-    private val onItemClick: (Photo)->Unit ={ }
+    private val onItemClick: (Photo) -> Unit = {}
+): RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>() {
 
-): RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>(){
-
-    // ViewHolder 类
     class PhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ivPhoto: ImageView = itemView.findViewById(R.id.ivPhoto)
     }
@@ -28,29 +26,35 @@ class PhotoAdapter(
         return PhotoViewHolder(view)
     }
 
-    // 绑定数据
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val photo = photos[position]
 
-        // 创建Glide配置
         val requestOptions = RequestOptions()
             .centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .placeholder(R.drawable.placeholder_image)
+            .placeholder(R.drawable.placeholder_image) // 确保有正确的占位图
             .error(android.R.drawable.ic_menu_camera)
 
         // 根据图片来源选择加载方式
         if (photo.isUserCreated && photo.filePath.isNotEmpty()) {
-            // 用户创建的图片：从文件路径加载
-            Glide.with(holder.itemView.context)
-                .load(File(photo.filePath))
-                .apply(requestOptions)
-                .into(holder.ivPhoto)
+            // 用户创建的图片：检查文件是否存在
+            val file = File(photo.filePath)
+            if (file.exists()) {
+                Glide.with(holder.itemView.context)
+                    .load(file)
+                    .apply(requestOptions)
+                    .transition(DrawableTransitionOptions.withCrossFade()) // 添加过渡动画
+                    .into(holder.ivPhoto)
+            } else {
+                // 文件不存在，显示错误图标
+                holder.ivPhoto.setImageResource(android.R.drawable.ic_menu_camera)
+            }
         } else if (photo.resourceId != 0) {
             // 系统图片：从资源ID加载
             Glide.with(holder.itemView.context)
                 .load(photo.resourceId)
                 .apply(requestOptions)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.ivPhoto)
         } else {
             // 默认图标
@@ -62,10 +66,9 @@ class PhotoAdapter(
             onItemClick(photo)
         }
     }
-    // 返回项目数量
+
     override fun getItemCount(): Int = photos.size
 
-    // 添加新图片
     fun addPhoto(newPhoto: Photo) {
         val newList = photos.toMutableList()
         newList.add(newPhoto)
@@ -73,7 +76,6 @@ class PhotoAdapter(
         notifyItemInserted(photos.size - 1)
     }
 
-    // 更新图片列表
     fun updatePhotos(newPhotos: List<Photo>) {
         photos = newPhotos
         notifyDataSetChanged()

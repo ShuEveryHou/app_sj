@@ -62,6 +62,7 @@ class TextEditActivity : AppCompatActivity() {
     private var imagePath: String? = null
     private var resourceId: Int = 0
     private var isFromCamera: Boolean = false
+    private var isUserCreated: Boolean = false
     private var originalBitmap: Bitmap? = null
 
     private var currentTextOverlay: TextOverlayView? = null
@@ -187,7 +188,7 @@ class TextEditActivity : AppCompatActivity() {
         updateFontButtons()
     }
 
-    private fun loadImageData() {
+    /*private fun loadImageData() {
         imagePath = intent.getStringExtra("photo_file_path")
         resourceId = intent.getIntExtra("photo_resource_id", 0)
         isFromCamera = intent.getBooleanExtra("is_from_camera", false)
@@ -209,6 +210,51 @@ class TextEditActivity : AppCompatActivity() {
                 loadBitmapFromResource(resourceId)
             }
         } else {
+            Toast.makeText(this, "图片数据错误", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+    }*/
+    private fun loadImageData() {
+        imagePath = intent.getStringExtra("photo_file_path")
+        resourceId = intent.getIntExtra("photo_resource_id", 0)
+        isFromCamera = intent.getBooleanExtra("is_from_camera", false)
+        isUserCreated = intent.getBooleanExtra("is_user_created", false)  // 添加这行
+
+        Log.d("TextEdit", "加载图片数据: path=$imagePath, resourceId=$resourceId, isUserCreated=$isUserCreated")
+
+        // 加载图片到ImageView
+        if ((isFromCamera || isUserCreated) && !imagePath.isNullOrEmpty()) {
+            // 从文件加载（包括用户创建的图片）
+            Log.d("TextEdit", "从文件加载用户图片: $imagePath")
+            val file = File(imagePath)
+            if (file.exists()) {
+                Glide.with(this)
+                    .load(file)
+                    .into(ivBackground)
+            } else {
+                Log.e("TextEdit", "文件不存在: $imagePath")
+                Toast.makeText(this, "图片文件不存在", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
+
+            // 异步加载原始Bitmap
+            scope.launch(Dispatchers.IO) {
+                loadBitmapFromFile(imagePath!!)
+            }
+        } else if (resourceId != 0) {
+            // 从资源加载（系统图片）
+            Log.d("TextEdit", "从资源加载系统图片: $resourceId")
+            Glide.with(this)
+                .load(resourceId)
+                .into(ivBackground)
+
+            // 异步加载原始Bitmap
+            scope.launch(Dispatchers.IO) {
+                loadBitmapFromResource(resourceId)
+            }
+        } else {
+            Log.e("TextEdit", "没有可用的图片数据")
             Toast.makeText(this, "图片数据错误", Toast.LENGTH_SHORT).show()
             finish()
         }

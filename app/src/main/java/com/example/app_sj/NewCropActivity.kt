@@ -4,9 +4,11 @@ import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -57,6 +59,8 @@ class NewCropActivity : AppCompatActivity() {
     private var resourceId: Int = 0
     private var isFromCamera: Boolean = false
 
+    private var isUserCreated: Boolean = false
+
     // 当前功能模式：true=裁剪，false=旋转
     private var isCropMode: Boolean = true
 
@@ -74,10 +78,6 @@ class NewCropActivity : AppCompatActivity() {
 
     // 防止频繁操作的标志
     private var isTransforming: Boolean = false
-
-    companion object {
-        const val REQUEST_NEW_CROP = 200
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,10 +140,12 @@ class NewCropActivity : AppCompatActivity() {
         imagePath = intent.getStringExtra("photo_file_path")
         resourceId = intent.getIntExtra("photo_resource_id", 0)
         isFromCamera = intent.getBooleanExtra("is_from_camera", false)
+        isUserCreated = intent.getBooleanExtra("is_user_created", false)
+
 
         // 加载原始Bitmap（使用较小尺寸，避免内存问题）
         try {
-            if (isFromCamera && !imagePath.isNullOrEmpty()) {
+            if ((isFromCamera || isUserCreated) && !imagePath.isNullOrEmpty()) {
                 // 从文件加载，使用采样
                 originalBitmap = decodeSampledBitmapFromFile(imagePath!!, 1024, 1024)
             } else if (resourceId != 0) {
@@ -781,6 +783,25 @@ class NewCropActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        }
+    }
+
+    companion object {
+        /**
+         * 启动NewCropActivity的静态方法
+         */
+        fun startForResult(activity: AppCompatActivity, photo: Photo) {
+            val intent = Intent(activity, NewCropActivity::class.java).apply {
+                // 传递图片数据
+                putExtra("photo_id", photo.id)
+                putExtra("photo_resource_id", photo.resourceId)
+                putExtra("photo_file_path", photo.filePath)
+                putExtra("photo_title", photo.title)
+                putExtra("is_from_camera", photo.isFromCamera)
+                putExtra("is_user_created", photo.isUserCreated)
+            }
+
+            activity.startActivity(intent)
         }
     }
 

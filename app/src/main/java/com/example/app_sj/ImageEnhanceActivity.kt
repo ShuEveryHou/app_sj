@@ -5,10 +5,13 @@ import android.graphics.*
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class ImageEnhanceActivity : AppCompatActivity() {
@@ -37,6 +40,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
     private var imagePath: String? = null
     private var resourceId: Int = 0
     private var isFromCamera: Boolean = false
+
+    private var isUserCreated: Boolean = false
     private var originalBitmap: Bitmap? = null
     private var processedBitmap: Bitmap? = null
 
@@ -107,9 +112,10 @@ class ImageEnhanceActivity : AppCompatActivity() {
         imagePath = intent.getStringExtra("photo_file_path")
         resourceId = intent.getIntExtra("photo_resource_id", 0)
         isFromCamera = intent.getBooleanExtra("is_from_camera", false)
+        isUserCreated = intent.getBooleanExtra("is_user_created", false)
 
         // 使用Glide加载图片（Glide会自动处理内存和线程）
-        if (isFromCamera && !imagePath.isNullOrEmpty()) {
+        if ((isFromCamera || isUserCreated) && !imagePath.isNullOrEmpty()) {
             Glide.with(this)
                 .load(File(imagePath))
                 .into(ivProcessed)

@@ -1,7 +1,10 @@
 // PublicAlbumActivity.kt - 完整版本
 package com.example.app_sj
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -10,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
+import java.io.File
 import kotlin.math.max
 import kotlin.math.min
 
@@ -17,6 +21,8 @@ class PublicAlbumActivity : AppCompatActivity() {
 
     private lateinit var rvPhotos: RecyclerView
     private lateinit var photoAdapter: PhotoAdapter
+
+    private lateinit var imageUpdateReceiver: BroadcastReceiver
 
     // 存储所有图片资源ID的列表
     private val photoResourceIds = mutableListOf<Int>()
@@ -33,6 +39,41 @@ class PublicAlbumActivity : AppCompatActivity() {
         rvPhotos.postDelayed({
             preloadVisibleImages()
         }, 50)
+
+        setupBroadcastReceiver()
+    }
+
+    private fun setupBroadcastReceiver() {
+        // 创建广播接收器
+        imageUpdateReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == "IMAGE_UPDATED") {
+                    runOnUiThread {
+                        refreshPhotos()
+                        Toast.makeText(this@PublicAlbumActivity, "图片已更新", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        // 使用LocalBroadcastManager（需要添加依赖）
+        val filter = IntentFilter("IMAGE_UPDATED")
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
+            .registerReceiver(imageUpdateReceiver, filter)
+    }
+
+    private fun refreshPhotos() {
+        loadSamplePhotos()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
+            .unregisterReceiver(imageUpdateReceiver)
+    }
+    private fun notifyImageUpdated(context: Context) {
+        val updateIntent = Intent("IMAGE_UPDATED")
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(context)
+            .sendBroadcast(updateIntent)
     }
 
     private fun setupToolbar() {
@@ -114,27 +155,37 @@ class PublicAlbumActivity : AppCompatActivity() {
             val resourceId = getResourceId(imageName)
 
             if (resourceId != 0) {
-                samplePhotos.add(Photo(index + 1, resourceId, "", title, false, false))
-            } else {
-                samplePhotos.add(Photo(index + 1, android.R.drawable.ic_menu_camera, "", "$title (默认)", false, false))
+                samplePhotos.add(Photo(
+                    id = index + 1,
+                    resourceId = resourceId,
+                    title = title
+                ))
             }
         }
 
-        // 2. 加载用户创建的图片（追加到列表末尾）
+        // 2. 加载用户创建的图片（放在系统图片之后）
         val userPhotos = ImageManager.getUserImages(this)
         val userStartId = samplePhotos.size + 1
 
         userPhotos.forEachIndexed { index, photo ->
-            // 重新分配ID，避免冲突
-            val newPhoto = Photo(
-                id = userStartId + index,
-                resourceId = 0,
-                filePath = photo.filePath,
-                title = photo.title,
-                isFromCamera = false,
-                isUserCreated = true
-            )
-            samplePhotos.add(newPhoto)
+            // 重要：检查文件是否存在
+            val file = if (photo.filePath.isNotEmpty()) {
+                java.io.File(photo.filePath)
+            } else {
+                null
+            }
+
+            if (file?.exists() == true) {
+                val newPhoto = Photo(
+                    id = userStartId + index,
+                    resourceId = 0,
+                    filePath = photo.filePath,
+                    title = photo.title,
+                    isFromCamera = false,
+                    isUserCreated = true
+                )
+                samplePhotos.add(newPhoto)
+            }
         }
 
         // 3. 更新适配器数据
@@ -143,9 +194,13 @@ class PublicAlbumActivity : AppCompatActivity() {
         // 4. 显示统计信息
         val systemCount = imageData.size
         val userCount = userPhotos.size
-        Toast.makeText(this,
-            "加载完成: ${systemCount}张系统图片 + ${userCount}张用户图片",
-            Toast.LENGTH_SHORT).show()
+        val validUserCount = samplePhotos.size - systemCount
+
+        if (validUserCount > 0) {
+            Toast.makeText(this,
+                "加载完成: ${systemCount}张系统图片 + ${validUserCount}张用户图片",
+                Toast.LENGTH_SHORT).show()
+        }
     }
     /**
      * 获取drawable资源ID
@@ -215,12 +270,23 @@ class PublicAlbumActivity : AppCompatActivity() {
         // 预加载相邻图片（为滑动查看做准备）
         preloadNeighborImages(photo.id - 1) // photo.id是从1开始的，所以要减1
 
+        Log.d("PublicAlbum", "打开图片详情: ID=${photo.id}, 类型=${if(photo.isUserCreated)"用户图片" else "系统图片"}")
+
         val intent = Intent(this, ImageDetailActivity::class.java).apply {
             putExtra("photo_id", photo.id)
             putExtra("photo_resource_id", photo.resourceId)
             putExtra("photo_title", photo.title)
             putExtra("is_from_camera", false)
+            putExtra("is_user_created", photo.isUserCreated)
+            putExtra("photo_file_path", photo.filePath)
         }
+
+        // 调试信息
+        Log.d("PublicAlbum", "传递数据:")
+        Log.d("PublicAlbum", "  filePath=${photo.filePath}")
+        Log.d("PublicAlbum", "  resourceId=${photo.resourceId}")
+        Log.d("PublicAlbum", "  isUserCreated=${photo.isUserCreated}")
+
         startActivity(intent)
     }
 

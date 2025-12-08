@@ -2,6 +2,7 @@
 package com.example.app_sj
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
@@ -29,6 +30,7 @@ object ImageManager {
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
             val fileName = "user_${timeStamp}.jpg"
 
+
             // 保存到应用私有目录
             val storageDir = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), USER_IMAGES_DIR)
             if (!storageDir.exists()) {
@@ -46,7 +48,11 @@ object ImageManager {
             // 保存图片信息
             saveImageInfo(context, fileName, title)
 
+            notifyImageUpdated(context)
+
             imageFile.absolutePath
+
+
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -55,7 +61,7 @@ object ImageManager {
         }
     }
 
-    /**
+        /**
      * 保存图片信息
      */
     private fun saveImageInfo(context: Context, fileName: String, title: String) {
@@ -74,6 +80,26 @@ object ImageManager {
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    private fun notifyImageUpdated(context: Context) {
+        try {
+            // 发送自定义广播通知图片更新
+            val updateIntent = Intent("IMAGE_UPDATED")
+
+            // 使用兼容性方式发送广播
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                // Android 13+
+                context.sendBroadcast(updateIntent, android.Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                context.sendBroadcast(updateIntent)
+            }
+
+            Log.d("ImageManager", "发送图片更新广播")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("ImageManager", "发送广播失败: ${e.message}")
         }
     }
 
