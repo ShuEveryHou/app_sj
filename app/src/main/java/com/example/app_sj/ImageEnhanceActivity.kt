@@ -46,6 +46,29 @@ class ImageEnhanceActivity : AppCompatActivity() {
     private lateinit var filterWarm: LinearLayout
     private lateinit var filterCold: LinearLayout
 
+    // ========== 贴纸相关属性 ==========
+    private lateinit var panelSticker: LinearLayout
+    private lateinit var stickerContainer: LinearLayout
+    private lateinit var btnBringForward: Button
+    private lateinit var btnSendBackward: Button
+    // 贴纸预览视图
+    private lateinit var stickerBlack_cat: LinearLayout
+    private lateinit var stickerCat_1: LinearLayout
+    private lateinit var stickerCloud_: LinearLayout
+    private lateinit var stickerCup_: LinearLayout
+    private lateinit var stickerCute_text: LinearLayout
+    private lateinit var stickerLucky_text: LinearLayout
+    private lateinit var stickerMoon_: LinearLayout
+    private lateinit var stickerSnack_: LinearLayout
+    private lateinit var stickerStart_cute: LinearLayout
+    private lateinit var stickerText_2: LinearLayout
+    private lateinit var stickerText_3: LinearLayout
+    private lateinit var stickerText_4: LinearLayout
+    private lateinit var stickerWolf_: LinearLayout
+
+    private var currentStickerView: StickerOverlayView? = null
+    private val stickerViews = mutableListOf<StickerOverlayView>()
+
     // ========== 数据状态 ==========
     private var imagePath: String? = null
     private var resourceId: Int = 0
@@ -107,6 +130,26 @@ class ImageEnhanceActivity : AppCompatActivity() {
         filterFresh = findViewById(R.id.filterFresh)
         filterWarm = findViewById(R.id.filterWarm)
         filterCold = findViewById(R.id.filterCold)
+
+        // 贴纸相关视图
+        panelSticker = findViewById(R.id.panelSticker)
+        stickerContainer = findViewById(R.id.stickerContainer)
+        btnBringForward = findViewById(R.id.btnBringForward)
+        btnSendBackward = findViewById(R.id.btnSendBackward)
+
+        stickerBlack_cat  = findViewById(R.id.stickerBlack_cat)
+        stickerCat_1    = findViewById(R.id.stickerCat_1)
+        stickerCloud_   = findViewById(R.id.stickerCloud_)
+        stickerCup_     = findViewById(R.id.stickerCup_)
+        stickerCute_text    = findViewById(R.id.stickerCute_text)
+        stickerLucky_text   = findViewById(R.id.stickerLucky_text)
+        stickerMoon_    = findViewById(R.id.stickerMoon_)
+        stickerSnack_   = findViewById(R.id.stickerSnack_)
+        stickerStart_cute   = findViewById(R.id.stickerStart_cute)
+        stickerText_2   = findViewById(R.id.stickerText_2)
+        stickerText_3   = findViewById(R.id.stickerText_3)
+        stickerText_4   = findViewById(R.id.stickerText_4)
+        stickerWolf_    = findViewById(R.id.stickerWolf_)
 
 
         seekBarBrightness = findViewById(R.id.seekBarBrightness)
@@ -239,8 +282,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
             togglePanel("filter")
         }
 
-        btnSticker.setOnClickListener {
-            Toast.makeText(this, "贴纸功能待实现", Toast.LENGTH_SHORT).show()
+        btnSticker.setOnClickListener {//贴纸按钮
+            togglePanel("sticker")
         }
 
         btnMerge.setOnClickListener {
@@ -292,6 +335,160 @@ class ImageEnhanceActivity : AppCompatActivity() {
 
         // 设置滤镜选择监听器
         setupFilterListeners()
+
+        // 贴纸功能初始化
+        setupStickerListeners()
+    }
+
+    /**
+     * 设置贴纸相关监听器
+     */
+    private fun setupStickerListeners() {
+        // 贴纸预览点击监听
+        stickerBlack_cat.setOnClickListener { addStickerToImage(StickerManager.StickerType.BLACK_CAT) }
+        stickerCat_1.setOnClickListener { addStickerToImage(StickerManager.StickerType.CAT_1) }
+        stickerCloud_.setOnClickListener { addStickerToImage(StickerManager.StickerType.CLOUD_) }
+        stickerCup_.setOnClickListener { addStickerToImage(StickerManager.StickerType.CUP_) }
+        stickerCute_text.setOnClickListener { addStickerToImage(StickerManager.StickerType.CUTE_TEXT) }
+        stickerLucky_text.setOnClickListener { addStickerToImage(StickerManager.StickerType.LUCKY_TEXT) }
+        stickerMoon_.setOnClickListener { addStickerToImage(StickerManager.StickerType.MOON_) }
+        stickerSnack_.setOnClickListener { addStickerToImage(StickerManager.StickerType.SNACK_) }
+        stickerStart_cute.setOnClickListener { addStickerToImage(StickerManager.StickerType.START_CUTE) }
+        stickerText_2.setOnClickListener { addStickerToImage(StickerManager.StickerType.TEXT_2) }
+        stickerText_3.setOnClickListener { addStickerToImage(StickerManager.StickerType.TEXT_3) }
+        stickerText_4.setOnClickListener { addStickerToImage(StickerManager.StickerType.TEXT_4) }
+        stickerWolf_.setOnClickListener { addStickerToImage(StickerManager.StickerType.WOLF_) }
+
+        // 层级按钮监听
+        btnBringForward.setOnClickListener {
+            currentStickerView?.bringForward()
+            updateStickerLayerButtons()
+        }
+
+        btnSendBackward.setOnClickListener {
+            currentStickerView?.sendBackward()
+            updateStickerLayerButtons()
+        }
+
+        // 图片容器点击监听（用于取消选择贴纸）
+        findViewById<FrameLayout>(R.id.imageContainer).setOnClickListener {
+            if (currentPanel == "sticker") {
+                currentStickerView?.setSelected(false)
+                currentStickerView = null
+                updateStickerLayerButtons()
+            }
+        }
+    }
+    /**
+     * 添加贴纸到图片
+     */
+    private fun addStickerToImage(stickerType: StickerManager.StickerType) {
+        val imageContainer = findViewById<FrameLayout>(R.id.imageContainer)
+
+        // 加载贴纸位图
+        val stickerBitmap = StickerManager.loadStickerBitmap(this, stickerType)
+        if (stickerBitmap == null) {
+            Toast.makeText(this, "贴纸加载失败", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 创建贴纸视图
+        val stickerView = StickerOverlayView(this).apply {
+            setStickerBitmap(stickerBitmap)
+
+            // 计算初始位置（居中）
+            val containerWidth = imageContainer.width.toFloat()
+            val containerHeight = imageContainer.height.toFloat()
+            val stickerWidth = stickerBitmap.width.toFloat() * 0.5f
+            val stickerHeight = stickerBitmap.height.toFloat() * 0.5f
+
+            setPosition(
+                containerWidth / 2 - stickerWidth / 2,
+                containerHeight / 2 - stickerHeight / 2
+            )
+
+            setOnStickerActionListener(object : StickerOverlayView.OnStickerActionListener {
+                override fun onStickerSelected(sticker: StickerOverlayView) {
+                    // 取消之前选中的贴纸
+                    currentStickerView?.setSelected(false)
+                    currentStickerView = sticker
+                    sticker.setSelected(true)
+                    updateStickerLayerButtons()
+                }
+
+                override fun onStickerDeleted(sticker: StickerOverlayView) {
+                    imageContainer.removeView(sticker)
+                    stickerViews.remove(sticker)
+                    if (currentStickerView == sticker) {
+                        currentStickerView = null
+                        updateStickerLayerButtons()
+                    }
+                }
+
+                override fun onStickerBringForward(sticker: StickerOverlayView) {
+                    sticker.bringForward()
+                }
+
+                override fun onStickerSendBackward(sticker: StickerOverlayView) {
+                    sticker.sendBackward()
+                }
+            })
+        }
+
+        // 添加到容器
+        imageContainer.addView(stickerView)
+        stickerViews.add(stickerView)
+
+        // 选中新添加的贴纸
+        currentStickerView?.setSelected(false)
+        currentStickerView = stickerView
+        stickerView.setSelected(true)
+        updateStickerLayerButtons()
+
+        Toast.makeText(this, "已添加${StickerManager.getStickerName(stickerType)}贴纸", Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * 更新贴纸层级按钮状态
+     */
+    private fun updateStickerLayerButtons() {
+        val hasSelectedSticker = currentStickerView != null
+        btnBringForward.isEnabled = hasSelectedSticker
+        btnSendBackward.isEnabled = hasSelectedSticker
+    }
+
+    /**
+     * 在画布上绘制贴纸（用于保存）
+     */
+    private fun drawStickerOnCanvas(
+        stickerView: StickerOverlayView,
+        canvas: Canvas,
+        imageWidth: Int,
+        imageHeight: Int
+    ) {
+        val drawData = stickerView.getDrawData()
+        drawData.bitmap?.let { bitmap ->
+            // 获取图片容器
+            val container = findViewById<FrameLayout>(R.id.imageContainer)
+            val scaleX = imageWidth.toFloat() / container.width
+            val scaleY = imageHeight.toFloat() / container.height
+
+            // 保存画布状态
+            canvas.save()
+
+            // 应用变换
+            canvas.translate(drawData.x * scaleX, drawData.y * scaleY)
+            canvas.scale(drawData.scale, drawData.scale)
+            canvas.rotate(drawData.rotation)
+
+            // 从中心点绘制
+            val left = -bitmap.width / 2f
+            val top = -bitmap.height / 2f
+            canvas.drawBitmap(bitmap, left, top, null)
+
+            // 恢复画布状态
+            canvas.restore()
+        }
     }
 
     /**
@@ -363,6 +560,13 @@ class ImageEnhanceActivity : AppCompatActivity() {
                 // 加载滤镜预览
                 loadFilterPreviews()
             }
+            "sticker" -> {  // 添加贴纸面板处理
+                panelSticker.visibility = View.VISIBLE
+                btnSticker.isSelected = true
+
+                // 更新层级按钮状态
+                updateStickerLayerButtons()
+            }
         }
     }
 
@@ -383,12 +587,21 @@ class ImageEnhanceActivity : AppCompatActivity() {
             panelFilter.visibility = View.GONE
         }
 
+        if (::panelSticker.isInitialized) {
+            panelSticker.visibility = View.GONE
+        }
+
         // 取消所有按钮的选中状态
         if (btnBrightness != null) btnBrightness.isSelected = false
         if (btnContrast != null) btnContrast.isSelected = false
         if (btnFilter != null) btnFilter.isSelected = false
         if (btnSticker != null) btnSticker.isSelected = false
         if (btnMerge != null) btnMerge.isSelected = false
+
+        // 取消贴纸选中状态
+        currentStickerView?.setSelected(false)
+        currentStickerView = null
+        updateStickerLayerButtons()
 
         currentPanel = "none"
         Log.d("PanelDebug", "当前面板重置为: $currentPanel")
@@ -692,7 +905,9 @@ class ImageEnhanceActivity : AppCompatActivity() {
     /**
      * 保存增强后的图片
      */
+/*
     private fun saveEnhancedImage() {
+        //获取基础图片
         val bitmapToSave = if (isFilterMode && filteredBitmap != null) {
             filteredBitmap
         } else {
@@ -735,6 +950,83 @@ class ImageEnhanceActivity : AppCompatActivity() {
             }
         }.start()
     }
+*/
+    private fun saveEnhancedImage() {
+        // 获取基础图片
+        val baseBitmap = if (isFilterMode && filteredBitmap != null) {
+            filteredBitmap
+        } else if (processedBitmap != null) {
+            processedBitmap
+        } else {
+            originalBitmap
+        }
+
+        if (baseBitmap == null) {
+            Toast.makeText(this, "图片未加载", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        Toast.makeText(this, "正在保存图片...", Toast.LENGTH_SHORT).show()
+
+        Thread {
+            try {
+                val resultBitmap: Bitmap
+
+                // 如果有贴纸，需要合成
+                if (stickerViews.isNotEmpty()) {
+                    resultBitmap = baseBitmap.copy(Bitmap.Config.ARGB_8888, true)
+                    val canvas = Canvas(resultBitmap)
+
+                    // 绘制基础图片
+                    canvas.drawBitmap(baseBitmap, 0f, 0f, null)
+
+                    // 绘制所有贴纸
+                    for (stickerView in stickerViews) {
+                        drawStickerOnCanvas(stickerView, canvas, baseBitmap.width, baseBitmap.height)
+                    }
+                } else {
+                    // 没有贴纸，直接使用基础图片
+                    resultBitmap = baseBitmap.copy(Bitmap.Config.ARGB_8888, true)
+                }
+
+                // 使用ImageManager保存
+                val savedPath = ImageManager.saveUserImage(
+                    this@ImageEnhanceActivity,
+                    resultBitmap,
+                    if (stickerViews.isNotEmpty()) {
+                        if (isFilterMode) "贴纸+滤镜图片" else "贴纸图片"
+                    } else {
+                        if (isFilterMode) "滤镜图片" else "增强图片"
+                    }
+                )
+
+                runOnUiThread {
+                    if (savedPath != null) {
+                        Toast.makeText(this@ImageEnhanceActivity, "保存成功！", Toast.LENGTH_SHORT).show()
+
+                        val result = Intent().apply {
+                            putExtra("saved_image_path", savedPath)
+                        }
+                        setResult(RESULT_OK, result)
+                        finish()
+                    } else {
+                        Toast.makeText(this@ImageEnhanceActivity, "保存失败", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                // 回收Bitmap
+                if (resultBitmap != baseBitmap) {
+                    resultBitmap.recycle()
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                runOnUiThread {
+                    Toast.makeText(this@ImageEnhanceActivity, "保存失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -747,6 +1039,13 @@ class ImageEnhanceActivity : AppCompatActivity() {
         originalBitmap = null
         processedBitmap = null
         filteredBitmap = null
+
+        // 清理贴纸视图
+        stickerViews.forEach {
+            it.getDrawData().bitmap?.recycle()
+        }
+        stickerViews.clear()
+        currentStickerView = null
 
         System.gc()
     }

@@ -126,7 +126,7 @@
                 android:textSize="14sp"
                 android:background="@drawable/btn_option_selector" />
 
-            <!-- 贴纸按钮（暂未实现） -->
+            <!-- 贴纸按钮-->
             <Button
                 android:id="@+id/btnSticker"
                 android:layout_width="0dp"
@@ -462,6 +462,420 @@
 
                     </LinearLayout>
 
+                </LinearLayout>
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
+        <!--贴纸选项框-->
+        <LinearLayout
+            android:id="@+id/panelSticker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#50000000"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <!-- 层级控制按钮行 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/btnSendBackward"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="下一层"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:background="@drawable/btn_option_selector"
+                    android:layout_marginEnd="8dp"
+                    android:enabled="false" />
+
+                <Button
+                    android:id="@+id/btnBringForward"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="上一层"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:background="@drawable/btn_option_selector"
+                    android:enabled="false" />
+
+            </LinearLayout>
+
+            <!-- 贴纸选择标题 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="选择贴纸"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- 贴纸选择区域 - 支持水平滑动 -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/stickerContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!--13种贴纸-->
+                    <!-- 贴纸1 -->
+                    <LinearLayout
+                        android:id="@+id/stickerBlack_cat"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/black_cat"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="黑猫贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="黑猫"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 贴纸2 -->
+                    <LinearLayout
+                        android:id="@+id/stickerCat_1"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/cat_1"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="黄猫贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="黄猫"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 贴纸3 -->
+                    <LinearLayout
+                        android:id="@+id/stickerCloud_"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/cloud_"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="云朵贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="云朵"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 贴纸4 -->
+                    <LinearLayout
+                        android:id="@+id/stickerCup_"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/cup_"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="杯子贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="杯子"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 贴纸5 -->
+                    <LinearLayout
+                        android:id="@+id/stickerCute_text"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/cute_text"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="可爱文字" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="可爱"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 贴纸6 -->
+                    <LinearLayout
+                        android:id="@+id/stickerLucky_text"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/lucky_text"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="幸运文字" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="幸运"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                    <!-- 贴纸7 -->
+                    <LinearLayout
+                        android:id="@+id/stickerMoon_"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/moon_"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="月亮贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="月亮"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                    <!-- 贴纸8 -->
+                    <LinearLayout
+                        android:id="@+id/stickerSnack_"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/snack_"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="小蛇贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="小蛇"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                    <!-- 贴纸9 -->
+                    <LinearLayout
+                        android:id="@+id/stickerStart_cute"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/start_cute"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="星星贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="星星"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                    <!-- 贴纸10 -->
+                    <LinearLayout
+                        android:id="@+id/stickerText_2"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/text_bb"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="棒棒贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="棒棒"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                    <!-- 贴纸11 -->
+                    <LinearLayout
+                        android:id="@+id/stickerText_3"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/text_kx"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="开心贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="开心"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                    <!-- 贴纸12 -->
+                    <LinearLayout
+                        android:id="@+id/stickerText_4"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/text_jy"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="加油贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="加油"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                    <!-- 贴纸13 -->
+                    <LinearLayout
+                        android:id="@+id/stickerWolf_"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/wolf_"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="灰狼贴纸" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="灰狼"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
                 </LinearLayout>
             </HorizontalScrollView>
 
