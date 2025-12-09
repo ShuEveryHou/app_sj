@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnPublicAlbum: MaterialButton
     private lateinit var btnPrivateAlbum: MaterialButton
 
-    private lateinit var btnCameraTest: MaterialButton  // 测试摄像头的按钮
     private lateinit var btnTakePhoto: MaterialButton  // 拍照按钮
 
     // 用于存储当前照片路径
@@ -70,7 +69,6 @@ class MainActivity : AppCompatActivity() {
         btnPublicAlbum=findViewById(R.id.btnPublicAlbum)
         btnPrivateAlbum=findViewById(R.id.btnPrivateAlbum)
 
-        btnCameraTest = findViewById(R.id.btnCameraTest)  // 初始化测试摄像头按钮
         btnTakePhoto = findViewById(R.id.btnTakePhoto)  // 初始化拍照按钮
     }
 
@@ -82,11 +80,6 @@ class MainActivity : AppCompatActivity() {
         //私有相册
         btnPrivateAlbum.setOnClickListener {
             navigatetoPrivateAlbum()
-        }
-
-        // 摄像头测试按钮
-        btnCameraTest.setOnClickListener {
-            navigateToCameraTest()
         }
 
         // 拍照按钮
@@ -135,7 +128,6 @@ class MainActivity : AppCompatActivity() {
             .setMessage("您的设备没有摄像头或摄像头不可用。\n\n如果您在使用模拟器，请确保已配置虚拟摄像头。")
             .setPositiveButton("确定", null)
             .setNegativeButton("打开相机测试") { _, _ ->
-                navigateToCameraTest()
             }
             .show()
     }
@@ -340,12 +332,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-
-    //摄像头测试函数
-    private fun navigateToCameraTest() {
-        val intent = Intent(this, CameraTestActivity::class.java)
-        startActivity(intent)
-    }
 
     private fun navigateToPublicAlbum(){
         //显示跳转intent

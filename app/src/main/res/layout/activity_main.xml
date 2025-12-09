@@ -73,20 +73,6 @@
         android:backgroundTint="@color/colorPrimary"
         android:textColor="@android:color/white" />
 
-    <!--摄像头测试按钮-->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCameraTest"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="摄像头测试"
-        android:textSize="16sp"
-        app:cornerRadius="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="?attr/colorPrimary"
-        android:textColor="@android:color/white" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

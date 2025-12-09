@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
-import java.io.File
 import kotlin.math.max
 import kotlin.math.min
 
@@ -118,36 +117,21 @@ class PublicAlbumActivity : AppCompatActivity() {
         }
 
         val imageData = listOf(
-            Pair("bao_1","图1"),
-            Pair("bao_2","图2"),
-            Pair("bao_3","图3"),
-            Pair("bao_4","图4"),
-            Pair("bao_5","图5"),
-            Pair("bao_6","图6"),
-            Pair("bao_7","图7"),
-            Pair("bao_8","图8"),
-            Pair("bao_9","图9"),
-            Pair("bao_10","图10"),
-            Pair("bao_11","图11"),
-            Pair("bao_12","图12"),
-            Pair("bao_13","图13"),
-            Pair("bao_14","图14"),
-            Pair("pic_1","图15"),
-            Pair("pic_2","图16"),
-            Pair("pic_3","图17"),
-            Pair("pic_4","图18"),
-            Pair("pic_5","图19"),
-            Pair("pic_6","图20"),
-            Pair("pic_7","图21"),
-            Pair("pic_8","图22"),
-            Pair("pic_9","图23"),
-            Pair("pic_10","图24"),
-            Pair("pic_11","图25"),
-            Pair("pic_12","图26"),
-            Pair("pic_13","图27"),
-            Pair("pic_14","图28"),
-            Pair("pic_15","图29"),
-            Pair("pic_16","图30"),
+            Pair("pic_1","图1"),
+            Pair("pic_2","图2"),
+            Pair("pic_3","图3"),
+            Pair("pic_4","图4"),
+            Pair("pic_5","图5"),
+            Pair("pic_6","图6"),
+            Pair("pic_7","图7"),
+            Pair("pic_8","图8"),
+            Pair("pic_9","图9"),
+            Pair("pic_10","图10"),
+            Pair("pic_11","图11"),
+            Pair("pic_12","图12"),
+            Pair("pic_13","图13"),
+            Pair("pic_14","图14"),
+            Pair("pic_15","图15"),
         )
 
         for ((index, data) in imageData.withIndex()) {
