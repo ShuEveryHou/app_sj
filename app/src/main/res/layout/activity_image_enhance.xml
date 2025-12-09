@@ -115,7 +115,7 @@
                 android:textSize="14sp"
                 android:background="@drawable/btn_option_selector" />
 
-            <!-- 滤镜按钮（暂未实现） -->
+            <!-- 滤镜按钮 -->
             <Button
                 android:id="@+id/btnFilter"
                 android:layout_width="0dp"
@@ -265,6 +265,205 @@
                     android:textSize="12sp" />
 
             </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 滤镜面板容器 -->
+        <LinearLayout
+            android:id="@+id/panelFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#50000000"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="选择滤镜"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- 滤镜选择区域 - 支持水平滑动 -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/filterContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- 原图滤镜 -->
+                    <LinearLayout
+                        android:id="@+id/filterOriginal"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_option_selector"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="原图" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="原图"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 黑白滤镜 -->
+                    <LinearLayout
+                        android:id="@+id/filterBlackWhite"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_option_selector"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="黑白" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="黑白"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 复古滤镜 -->
+                    <LinearLayout
+                        android:id="@+id/filterRetro"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_option_selector"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="复古" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="复古"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 清新滤镜 -->
+                    <LinearLayout
+                        android:id="@+id/filterFresh"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_option_selector"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="清新" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="清新"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 暖色调滤镜 -->
+                    <LinearLayout
+                        android:id="@+id/filterWarm"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_option_selector"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="暖色调" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="暖色调"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- 冷色调滤镜 -->
+                    <LinearLayout
+                        android:id="@+id/filterCold"
+                        android:layout_width="80dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/filter_item_selector"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_option_selector"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="冷色调" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="冷色调"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </HorizontalScrollView>
 
         </LinearLayout>
 
