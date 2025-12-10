@@ -10,10 +10,10 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 
+
+//这个文件基本上是实现扩展功能，代码量大
 class ImageEnhanceActivity : AppCompatActivity() {
 
     // ========== 视图组件 ==========
@@ -340,9 +340,7 @@ class ImageEnhanceActivity : AppCompatActivity() {
         setupStickerListeners()
     }
 
-    /**
-     * 设置贴纸相关监听器
-     */
+    //设置贴纸相关监听器
     private fun setupStickerListeners() {
         // 贴纸预览点击监听
         stickerBlack_cat.setOnClickListener { addStickerToImage(StickerManager.StickerType.BLACK_CAT) }
@@ -379,9 +377,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
             }
         }
     }
-    /**
-     * 添加贴纸到图片
-     */
+
+    //添加贴纸到图片
     private fun addStickerToImage(stickerType: StickerManager.StickerType) {
         val imageContainer = findViewById<FrameLayout>(R.id.imageContainer)
 
@@ -448,18 +445,16 @@ class ImageEnhanceActivity : AppCompatActivity() {
         Toast.makeText(this, "已添加${StickerManager.getStickerName(stickerType)}贴纸", Toast.LENGTH_SHORT).show()
     }
 
-    /**
-     * 更新贴纸层级按钮状态
-     */
+
+    //更新贴纸层级按钮状态
     private fun updateStickerLayerButtons() {
         val hasSelectedSticker = currentStickerView != null
         btnBringForward.isEnabled = hasSelectedSticker
         btnSendBackward.isEnabled = hasSelectedSticker
     }
 
-    /**
-     * 在画布上绘制贴纸（用于保存）
-     */
+
+    //在画布上绘制贴纸（用于保存）
     private fun drawStickerOnCanvas(
         stickerView: StickerOverlayView,
         canvas: Canvas,
@@ -491,9 +486,7 @@ class ImageEnhanceActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 设置滤镜选择监听器
-     */
+    //设置滤镜选择监听器
     private fun setupFilterListeners() {
 
         filterOriginal.setOnClickListener {//原图
@@ -521,9 +514,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 切换面板显示
-     */
+
+    //切换面板显示
     private fun togglePanel(panelName: String) {
 
         // 如果点击的是当前已展开的面板，则关闭它
@@ -570,9 +562,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 关闭所有面板
-     */
+
+    //关闭所有面板
     private fun closeAllPanels() {
 
         if (panelBrightness != null) {
@@ -719,9 +710,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
         return result
     }
 
-    /**
-     * 选择滤镜
-     */
+
+    //选择滤镜
     private fun selectFilter(filterType: FilterUtils.FilterType) {
 
         // 更新当前滤镜
@@ -734,9 +724,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
         applyFilterToImage(filterType)
     }
 
-    /**
-     * 更新滤镜选中状态
-     */
+
+    //更新滤镜选中状态
     private fun updateFilterSelection() {
         // 清除所有选中状态
         filterOriginal.isSelected = false
@@ -759,9 +748,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
 
     }
 
-    /**
-     * 加载滤镜预览图
-     */
+
+    //加载滤镜预览图
     private fun loadFilterPreviews() {
         if (originalBitmap == null) {
             return
@@ -835,9 +823,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
         }.start()
     }
 
-    /**
-     * 应用滤镜到图片
-     */
+
+    //应用滤镜到图片
     private fun applyFilterToImage(filterType: FilterUtils.FilterType) {
         if (originalBitmap == null) {
             Log.d("FilterDebug", "原始图片为空，无法应用滤镜")
@@ -882,9 +869,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
         }.start()
     }
 
-    /**
-     * 获取滤镜名称
-     */
+
+    //获取滤镜名称
     private fun getFilterName(filterType: FilterUtils.FilterType): String {
         return when (filterType) {
             FilterUtils.FilterType.ORIGINAL -> "原图"
@@ -902,55 +888,8 @@ class ImageEnhanceActivity : AppCompatActivity() {
         tvContrastValue.text = contrastRaw.toString()
     }
 
-    /**
-     * 保存增强后的图片
-     */
-/*
-    private fun saveEnhancedImage() {
-        //获取基础图片
-        val bitmapToSave = if (isFilterMode && filteredBitmap != null) {
-            filteredBitmap
-        } else {
-            processedBitmap
-        }
 
-        if (bitmapToSave == null) {
-            Toast.makeText(this, "图片未加载", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        Toast.makeText(this, "正在保存图片...", Toast.LENGTH_SHORT).show()
-
-        Thread {
-            try {
-                val savedPath = ImageManager.saveUserImage(
-                    this@ImageEnhanceActivity,
-                    bitmapToSave,
-                    if (isFilterMode) "滤镜图片" else "增强图片"
-                )
-
-                runOnUiThread {
-                    if (savedPath != null) {
-                        Toast.makeText(this@ImageEnhanceActivity, "保存成功！", Toast.LENGTH_SHORT).show()
-
-                        val result = Intent().apply {
-                            putExtra("saved_image_path", savedPath)
-                        }
-                        setResult(RESULT_OK, result)
-                        finish()
-                    } else {
-                        Toast.makeText(this@ImageEnhanceActivity, "保存失败", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                runOnUiThread {
-                    Toast.makeText(this@ImageEnhanceActivity, "保存失败: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.start()
-    }
-*/
+    //保存综合变换后的图片
     private fun saveEnhancedImage() {
         // 获取基础图片
         val baseBitmap = if (isFilterMode && filteredBitmap != null) {

@@ -144,9 +144,7 @@ class ImageDetailActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 加载图片数据
-     */
+    //加载图片数据，并显示图片路径数量及来源
     @SuppressLint("SetTextI18n")
     private fun loadImageData() {
         // 从Intent获取所有数据
@@ -179,9 +177,8 @@ class ImageDetailActivity : AppCompatActivity() {
         loadImage()
     }
 
-    /**
-     * 加载图片
-     */
+
+    //加载图片到放大区域
     private fun loadImage() {
         Log.d("ImageDetail", "开始加载图片...")
 
@@ -256,9 +253,7 @@ class ImageDetailActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 启动裁剪活动
-     */
+    //启动裁剪活动
     private fun startCropActivity() {
         Log.d("ImageDetail", "启动裁剪活动")
 
@@ -281,9 +276,8 @@ class ImageDetailActivity : AppCompatActivity() {
         newCropLauncher.launch(intent)
     }
 
-    /**
-     * 启动综合编辑活动
-     */
+
+    //启动综合编辑活动
     private fun startEnhanceActivity() {
         Log.d("ImageDetail", "启动综合编辑活动")
 
@@ -306,9 +300,8 @@ class ImageDetailActivity : AppCompatActivity() {
         enhanceLauncher.launch(intent)
     }
 
-    /**
-     * 启动文字编辑活动
-     */
+
+    //启动文字编辑活动
     private fun startTextEditActivity() {
         Log.d("ImageDetail", "启动文字编辑活动")
 
@@ -331,9 +324,8 @@ class ImageDetailActivity : AppCompatActivity() {
         textEditLauncher.launch(intent)
     }
 
-    /**
-     * 创建当前图片的Photo对象
-     */
+
+    //创建当前图片的Photo对象
     private fun createCurrentPhoto(): Photo {
         return Photo(
             id = currentPhotoId,
@@ -345,9 +337,7 @@ class ImageDetailActivity : AppCompatActivity() {
         )
     }
 
-    /**
-     * 编辑后更新图片显示
-     */
+    //编辑后更新图片显示
     private fun updateImageAfterEdit(newImagePath: String) {
         Log.d("ImageDetail", "更新图片: $newImagePath")
 

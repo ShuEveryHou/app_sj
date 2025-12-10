@@ -105,9 +105,7 @@ class PublicAlbumActivity : AppCompatActivity() {
         })
     }
 
-    /**
-     * 加载示例图片
-     */
+    //加载drawable中的图片
     private fun loadSamplePhotos() {
         val samplePhotos = mutableListOf<Photo>()
 
@@ -186,16 +184,13 @@ class PublicAlbumActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT).show()
         }
     }
-    /**
-     * 获取drawable资源ID
-     */
+
+    //获取drawable资源ID
     private fun getResourceId(imageName: String): Int {
         return resources.getIdentifier(imageName, "drawable", packageName)
     }
 
-    /**
-     * 预加载当前可见和即将可见的图片
-     */
+    //预加载当前可见和即将可见的图片
     private fun preloadVisibleImages() {
         // 确保photoResourceIds不为空
         if (photoResourceIds.isEmpty()) {
@@ -240,9 +235,7 @@ class PublicAlbumActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 打开图片详情页面
-     */
+    //打开图片详情页面
     private fun openImageDetail(photo: Photo) {
         // 立即预加载当前点击的图片（确保详情页快速显示）
         if (photo.resourceId != 0) {
@@ -274,9 +267,7 @@ class PublicAlbumActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    /**
-     * 预加载相邻的图片
-     */
+    //预加载相邻的图片，用于提前预览图片，但是不一次全部加载
     private fun preloadNeighborImages(currentIndex: Int) {
         if (photoResourceIds.isEmpty()) return
 
@@ -304,9 +295,7 @@ class PublicAlbumActivity : AppCompatActivity() {
         finish()
     }
 
-    /**
-     * dp转px的扩展函数
-     */
+    //dp转px的扩展函数
     private fun Int.dpToPx(): Int {
         return (this * resources.displayMetrics.density).toInt()
     }

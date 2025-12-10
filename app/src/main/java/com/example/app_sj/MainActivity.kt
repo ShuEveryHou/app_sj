@@ -88,9 +88,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 检查并请求相机权限
-     */
+    //检查并请求相机权限
     private fun checkAndRequestCameraPermission() {
         // 检查设备是否有相机硬件
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
@@ -119,9 +117,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    /**
-     * 显示无相机对话框
-     */
+
+    //显示无相机对话框
     private fun showNoCameraDialog() {
         AlertDialog.Builder(this)
             .setTitle("无法拍照")
@@ -131,9 +128,8 @@ class MainActivity : AppCompatActivity() {
             }
             .show()
     }
-    /**
-     * 显示权限解释对话框
-     */
+
+    //显示权限授予提示
     private fun showPermissionRationaleDialog() {
         AlertDialog.Builder(this)
             .setTitle("需要相机权限")
@@ -144,9 +140,8 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("取消", null)
             .show()
     }
-    /**
-     * 启动相机
-     */
+
+    //启动相机
     private fun launchCamera() {
         try {
             // 创建图片文件
@@ -186,9 +181,8 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "启动相机失败: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
-    /**
-     * 创建图片文件
-     */
+
+    //创建相机拍照图片文件
     @Throws(Exception::class)
     private fun createImageFile(): File {
         // 创建时间戳文件名
@@ -213,9 +207,8 @@ class MainActivity : AppCompatActivity() {
         return imageFile
     }
 
-    /**
-     * 处理拍摄的照片
-     */
+
+    //处理拍摄的照片
     private fun handleCapturedPhoto() {
         if (currentPhotoPath.isNullOrEmpty()) {
             Toast.makeText(this, "照片保存失败", Toast.LENGTH_SHORT).show()
@@ -232,9 +225,8 @@ class MainActivity : AppCompatActivity() {
         showPhotoConfirmationDialog(photoFile)
     }
 
-    /**
-     * 显示照片确认对话框
-     */
+
+    //提示照片编辑保存选项
     private fun showPhotoConfirmationDialog(photoFile: File) {
         AlertDialog.Builder(this)
             .setTitle("拍照成功")
@@ -255,9 +247,8 @@ class MainActivity : AppCompatActivity() {
             }
             .show()
     }
-    /**
-     * 保存照片到用户相册
-     */
+
+    //保存照片到用户相册
     private fun savePhotoToUserAlbum(photoFile: File) {
         try {
             // 读取图片文件
@@ -296,18 +287,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 通知图片更新
-     */
+
+    //通知图片更新
     private fun notifyImageUpdated() {
         val updateIntent = Intent("IMAGE_UPDATED")
         androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
             .sendBroadcast(updateIntent)
     }
 
-    /**
-     * 导航到图片详情页
-     */
+
+    //导航到图片详情页
     private fun navigateToImageDetail(imagePath: String) {
         // 创建Photo对象
         val photo = Photo(

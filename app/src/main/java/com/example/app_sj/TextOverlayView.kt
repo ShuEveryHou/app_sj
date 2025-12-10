@@ -145,9 +145,6 @@ class TextOverlayView(context: Context) : View(context) {
         invalidate()
     }
 
-    // 获取选中状态
-    fun isOverlaySelected(): Boolean = isOverlaySelected
-
     private fun updateFont() {
         when (fontType) {
             "粗体" -> {
@@ -418,7 +415,7 @@ class TextOverlayView(context: Context) : View(context) {
             isAntiAlias = true
         }
 
-        // 更精确的坐标转换
+        // 坐标转换
         val screenX = posX * imageWidth / resources.displayMetrics.widthPixels
         val screenY = posY * imageHeight / resources.displayMetrics.heightPixels
 

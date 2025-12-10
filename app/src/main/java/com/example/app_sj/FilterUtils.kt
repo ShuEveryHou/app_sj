@@ -1,12 +1,8 @@
 package com.example.app_sj
 
 import android.graphics.*
-import kotlin.math.max
-import kotlin.math.min
 
-/**
- * 滤镜工具类 - 手动实现6种基础滤镜
- */
+//滤镜工具类 - 手动实现6种基础滤镜
 object FilterUtils {
 
     // 滤镜类型枚举
@@ -19,12 +15,7 @@ object FilterUtils {
         COLD          // 冷色调
     }
 
-    /**
-     * 应用滤镜效果
-     * @param src 原始Bitmap
-     * @param filterType 滤镜类型
-     * @return 应用滤镜后的Bitmap
-     */
+    //应用滤镜效果
     fun applyFilter(src: Bitmap, filterType: FilterType): Bitmap {
         // 确保使用合适的配置，避免内存问题
         val safeConfig = src.config ?: Bitmap.Config.ARGB_8888
@@ -39,16 +30,14 @@ object FilterUtils {
         }
     }
 
-    /**
-     * 原图滤镜（无效果）
-     */
+
+    //原图滤镜（无效果）
     private fun applyOriginalFilter(src: Bitmap, config: Bitmap.Config): Bitmap {
         return src.copy(config, true)
     }
 
-    /**
-     * 黑白滤镜 - 灰度化处理
-     */
+
+    //黑白滤镜 - 灰度化处理
     private fun applyBlackWhiteFilter(src: Bitmap): Bitmap {
         val width = src.width
         val height = src.height
@@ -82,9 +71,8 @@ object FilterUtils {
         return result
     }
 
-    /**
-     * 复古滤镜 - 黄褐色调
-     */
+
+    //复古滤镜 - 黄褐色调
     private fun applyRetroFilter(src: Bitmap): Bitmap {
         val width = src.width
         val height = src.height
@@ -123,9 +111,8 @@ object FilterUtils {
         return result
     }
 
-    /**
-     * 清新滤镜 - 增强绿色和蓝色，提高亮度
-     */
+
+    //清新滤镜 - 增强绿色和蓝色，提高亮度
     private fun applyFreshFilter(src: Bitmap): Bitmap {
         val width = src.width
         val height = src.height
@@ -168,9 +155,8 @@ object FilterUtils {
         return result
     }
 
-    /**
-     * 暖色调滤镜 - 增加红色和黄色
-     */
+
+    //暖色调滤镜 - 增加红色和黄色
     private fun applyWarmFilter(src: Bitmap): Bitmap {
         val width = src.width
         val height = src.height
@@ -208,9 +194,8 @@ object FilterUtils {
         return result
     }
 
-    /**
-     * 冷色调滤镜 - 增加蓝色和青色
-     */
+
+    //冷色调滤镜 - 增加蓝色和青色
     private fun applyColdFilter(src: Bitmap): Bitmap {
         val width = src.width
         val height = src.height
@@ -249,9 +234,8 @@ object FilterUtils {
         return result
     }
 
-    /**
-     * 创建滤镜预览图（小尺寸，用于显示）
-     */
+
+    //创建滤镜预览图（小尺寸，用于显示）
     fun createFilterPreview(src: Bitmap, filterType: FilterType, previewSize: Int): Bitmap {
         try {
             // 先缩小原始图片（使用ARGB_8888确保质量）
@@ -300,9 +284,8 @@ object FilterUtils {
         }
     }
 
-    /**
-     * 创建颜色预览（备用方案）
-     */
+
+    //创建颜色预览（备用方案）
     private fun createColorPreview(size: Int, filterType: FilterType): Bitmap {
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)

@@ -376,9 +376,7 @@ class TextEditActivity : AppCompatActivity() {
         setupPanelControls()
     }
 
-    /**
-     * 设置面板内控件的监听器
-     */
+    //设置面板内控件的监听器
     private fun setupPanelControls() {
         // 透明度滑块
         seekBarAlpha.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -439,9 +437,8 @@ class TextEditActivity : AppCompatActivity() {
         seekBarGreen.setOnSeekBarChangeListener(colorSeekBarListener)
         seekBarBlue.setOnSeekBarChangeListener(colorSeekBarListener)
     }
-    /**
-     * 切换面板显示
-     */
+
+    //切换面板显示
     private fun togglePanel(panelName: String) {
         // 如果点击的是当前已展开的面板，则关闭它
         if (currentPanel == panelName) {
@@ -475,9 +472,8 @@ class TextEditActivity : AppCompatActivity() {
             }
         }
     }
-    /**
-     * 关闭所有面板
-     */
+
+    //关闭所有面板
     private fun closeAllPanels() {
         // 隐藏所有面板
         panelAlpha.visibility = View.GONE
@@ -494,27 +490,21 @@ class TextEditActivity : AppCompatActivity() {
         currentPanel = "none"
     }
 
-    /**
-     * 选择字体
-     */
+    //选择字体
     private fun selectFont(fontName: String) {
         currentFont = fontName
         updateFontButtons()
         currentTextOverlay?.setFontType(currentFont)
     }
 
-    /**
-     * 更新字体按钮选中状态
-     */
+    //更新字体按钮选中状态
     private fun updateFontButtons() {
         btnFont1.isSelected = (currentFont == "默认字体")
         btnFont2.isSelected = (currentFont == "粗体")
         btnFont3.isSelected = (currentFont == "艺术体")
     }
 
-    /**
-     * 从滑块更新颜色
-     */
+    //从滑块更新颜色
     private fun updateColorFromSliders() {
         val red = seekBarRed.progress
         val green = seekBarGreen.progress
@@ -530,9 +520,7 @@ class TextEditActivity : AppCompatActivity() {
         currentTextOverlay?.setTextColor(currentColor)
     }
 
-    /**
-     * 从当前颜色更新滑块
-     */
+    //从当前颜色更新滑块
     private fun updateColorFromCurrent() {
         val red = Color.red(currentColor)
         val green = Color.green(currentColor)
@@ -549,9 +537,7 @@ class TextEditActivity : AppCompatActivity() {
         updateColorPreview()
     }
 
-    /**
-     * 更新颜色预览
-     */
+    //更新颜色预览
     private fun updateColorPreview() {
         colorPreview.setBackgroundColor(currentColor)
         tvHexColor.text = String.format("#%08X", 0xFF000000.toInt() or currentColor)
@@ -616,9 +602,7 @@ class TextEditActivity : AppCompatActivity() {
         closeAllPanels()
     }
 
-    /**
-     * 从文本框更新当前设置
-     */
+    //从文本框更新当前设置
     private fun updateCurrentSettingsFromOverlay(textOverlay: TextOverlayView) {
         currentFont = textOverlay.getFontType()
         currentSize = textOverlay.getTextSize()
@@ -632,9 +616,8 @@ class TextEditActivity : AppCompatActivity() {
         // 更新滑块位置
         updateSlidersFromCurrent()
     }
-    /**
-     * 根据当前设置更新滑块
-     */
+
+    //根据当前设置更新滑块
     private fun updateSlidersFromCurrent() {
         // 透明度：50%-100%映射到128-255
         val alphaPercent = (currentAlpha * 100 / 255).coerceIn(50, 100)

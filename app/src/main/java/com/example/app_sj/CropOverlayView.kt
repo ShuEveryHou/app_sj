@@ -7,12 +7,10 @@ import android.view.MotionEvent
 import android.view.View
 import kotlin.math.abs
 import kotlin.math.min
-import kotlin.math.max
 
-/**
- * 裁剪框视图 - 用于显示裁剪区域并处理用户交互
- * 这是一个独立的裁剪框覆盖层，不包含图片显示功能
- */
+
+
+//剪裁框设计，白色框显示剪裁的区域
 class CropOverlayView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -106,11 +104,7 @@ class CropOverlayView @JvmOverloads constructor(
     }
 
     // ========== 公开方法 ==========
-
-    /**
-     * 设置裁剪比例
-     * @param ratio 比例值，0表示自由比例
-     */
+    //设置剪裁比例，0表示自由比例，@param ratio比例值
     fun setCropRatio(ratio: Float) {
         currentRatio = ratio
         if (width > 0 && height > 0) {
@@ -120,9 +114,9 @@ class CropOverlayView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * 重置裁剪框到默认位置和大小
-     */
+
+    //重置裁剪框到默认位置和大小
+
     fun resetCropRect() {
         if (width > 0 && height > 0) {
             createDefaultCropRect()
@@ -131,33 +125,21 @@ class CropOverlayView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * 设置裁剪框变化监听器
-     */
+
+    //设置裁剪框变化监听器
     fun setOnCropChangeListener(listener: OnCropChangeListener) {
         this.cropChangeListener = listener
     }
 
-    /**
-     * 获取当前裁剪框
-     */
+
+    //获取当前裁剪框
     fun getCropRect(): RectF {
         return RectF(cropRect)
     }
 
-    /**
-     * 设置裁剪框（用于从外部恢复状态）
-     */
-    fun setCropRect(rect: RectF) {
-        cropRect.set(rect)
-        ensureCropRectInBounds()
-        invalidate()
-        notifyCropChanged()
-    }
 
-    /**
-     * 显示/隐藏裁剪框
-     */
+
+    //显示/隐藏裁剪框
     fun setShowCropRect(show: Boolean) {
         showCropRect = show
         if (show && width > 0 && height > 0) {
@@ -186,7 +168,6 @@ class CropOverlayView @JvmOverloads constructor(
     }
 
     // ========== 绘制方法 ==========
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -205,9 +186,8 @@ class CropOverlayView @JvmOverloads constructor(
         drawCornerHandles(canvas)
     }
 
-    /**
-     * 绘制遮罩层
-     */
+
+    //绘制遮罩层
     private fun drawMask(canvas: Canvas) {
         // 上部分
         canvas.drawRect(0f, 0f, width.toFloat(), cropRect.top, maskPaint)
@@ -219,9 +199,8 @@ class CropOverlayView @JvmOverloads constructor(
         canvas.drawRect(cropRect.right, cropRect.top, width.toFloat(), cropRect.bottom, maskPaint)
     }
 
-    /**
-     * 绘制九宫格网格线
-     */
+
+    //绘制九宫格网格线
     private fun drawGridLines(canvas: Canvas) {
         val thirdWidth = cropRect.width() / 3
         val thirdHeight = cropRect.height() / 3
@@ -239,9 +218,8 @@ class CropOverlayView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * 绘制角落手柄
-     */
+
+    //绘制角落手柄
     private fun drawCornerHandles(canvas: Canvas) {
         val halfHandle = HANDLE_SIZE / 2
 
@@ -275,7 +253,6 @@ class CropOverlayView @JvmOverloads constructor(
     }
 
     // ========== 触摸事件处理 ==========
-
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!showCropRect) return false
 
@@ -319,9 +296,8 @@ class CropOverlayView @JvmOverloads constructor(
         return super.onTouchEvent(event)
     }
 
-    /**
-     * 根据拖拽模式调整裁剪框
-     */
+
+    //根据拖拽模式调整裁剪框
     private fun adjustCropRect(dx: Float, dy: Float) {
         when (dragMode) {
             DRAG_MOVE -> moveCropRect(dx, dy)
@@ -356,9 +332,8 @@ class CropOverlayView @JvmOverloads constructor(
         ensureCropRectInBounds()
     }
 
-    /**
-     * 获取拖拽模式
-     */
+
+    //获取拖拽模式
     private fun getDragMode(x: Float, y: Float): Int {
         // 检查角落
         if (isPointNear(x, y, cropRect.left, cropRect.top)) return DRAG_TOP_LEFT
@@ -384,9 +359,8 @@ class CropOverlayView @JvmOverloads constructor(
         return DRAG_NONE
     }
 
-    /**
-     * 判断点是否在指定点附近
-     */
+
+    //判断点是否在指定点附近
     private fun isPointNear(x: Float, y: Float, pointX: Float, pointY: Float): Boolean {
         return abs(x - pointX) <= TOUCH_TOLERANCE && abs(y - pointY) <= TOUCH_TOLERANCE
     }
@@ -433,9 +407,8 @@ class CropOverlayView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * 调整裁剪框以保持固定比例
-     */
+
+    //调整裁剪框以保持固定比例
     private fun adjustToKeepRatio() {
         if (currentRatio <= 0) return
 
@@ -485,9 +458,8 @@ class CropOverlayView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * 确保裁剪框在视图边界内
-     */
+
+    //确保裁剪框在视图边界内
     private fun ensureCropRectInBounds() {
         // 左边界
         if (cropRect.left < 0) {
@@ -540,10 +512,7 @@ class CropOverlayView @JvmOverloads constructor(
     }
 
     // ========== 辅助方法 ==========
-
-    /**
-     * 创建初始裁剪框（根据比例）
-     */
+    //创建初始裁剪框（根据比例）
     private fun createInitialCropRect() {
         val viewWidth = width.toFloat()
         val viewHeight = height.toFloat()
@@ -584,9 +553,8 @@ class CropOverlayView @JvmOverloads constructor(
         showCropRect = true
     }
 
-    /**
-     * 创建默认裁剪框（自由比例）
-     */
+
+    //创建默认裁剪框（自由比例）
     private fun createDefaultCropRect() {
         val viewWidth = width.toFloat()
         val viewHeight = height.toFloat()
@@ -607,9 +575,8 @@ class CropOverlayView @JvmOverloads constructor(
         showCropRect = true
     }
 
-    /**
-     * 通知裁剪框变化
-     */
+
+    //通知裁剪框变化
     private fun notifyCropChanged() {
         cropChangeListener?.onCropChanged(RectF(cropRect))
     }

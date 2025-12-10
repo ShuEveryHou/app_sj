@@ -1,4 +1,3 @@
-// ImageManager.kt
 package com.example.app_sj
 
 import android.content.Context
@@ -13,17 +12,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-/**
- * 图片管理器 - 管理用户创建的图片
- */
+
+//本文件作为图片管理器，用于管理编辑保存以及拍照产生的图片
 object ImageManager {
 
     private const val USER_IMAGES_DIR = "user_images"
     private const val INFO_FILE = "images_info.txt"
 
-    /**
-     * 保存用户创建的图片
-     */
+
+    //保存用户创建的图片
     fun saveUserImage(context: Context, bitmap: Bitmap, title: String = ""): String? {
         return try {
             // 创建时间戳文件名
@@ -61,9 +58,7 @@ object ImageManager {
         }
     }
 
-        /**
-     * 保存图片信息
-     */
+    //保存图片信息
     private fun saveImageInfo(context: Context, fileName: String, title: String) {
         try {
             val infoFile = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
@@ -103,9 +98,7 @@ object ImageManager {
         }
     }
 
-    /**
-     * 获取所有用户创建的图片
-     */
+    //获取所有用户创建的图片
     fun getUserImages(context: Context): List<Photo> {
         val userPhotos = mutableListOf<Photo>()
 
@@ -165,35 +158,5 @@ object ImageManager {
         }
 
         return userPhotos
-    }
-
-    /**
-     * 删除用户图片
-     */
-    fun deleteUserImage(context: Context, filePath: String): Boolean {
-        return try {
-            val file = File(filePath)
-            if (file.exists()) {
-                file.delete()
-            }
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
-
-    /**
-     * 清空所有用户图片
-     */
-    fun clearAllUserImages(context: Context) {
-        try {
-            val storageDir = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), USER_IMAGES_DIR)
-            if (storageDir.exists() && storageDir.isDirectory) {
-                storageDir.deleteRecursively()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 }

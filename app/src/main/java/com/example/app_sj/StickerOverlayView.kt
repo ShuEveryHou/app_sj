@@ -8,9 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import kotlin.math.*
 
-/**
- * 贴纸覆盖视图 - 支持拖动、缩放、旋转、删除
- */
+//贴纸覆盖视图，能够拖动、缩放、旋转、删除
 class StickerOverlayView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -52,7 +50,6 @@ class StickerOverlayView @JvmOverloads constructor(
 
     // 按钮大小
     private val buttonSize = 36f
-    private val touchTolerance = 50f
 
     // 监听器
     private var actionListener: OnStickerActionListener? = null
@@ -84,15 +81,12 @@ class StickerOverlayView @JvmOverloads constructor(
         invalidate()
     }
 
-    // 修复报红一：添加override修饰符
+
     override fun setSelected(selected: Boolean) {
         super.setSelected(selected)
         this.isSelected = selected
         invalidate()
     }
-
-    // 重命名方法以避免冲突
-    fun isStickerSelected(): Boolean = isSelected
 
     fun bringForward() {
         parent?.let {
@@ -301,7 +295,7 @@ class StickerOverlayView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
-                // 修复报红二：处理所有Action枚举值
+
                 when (currentAction) {
                     Action.DRAG -> {
                         val dx = x - lastTouchX
@@ -374,9 +368,7 @@ class StickerOverlayView @JvmOverloads constructor(
                 transformedY >= borderRect.top && transformedY <= borderRect.bottom
     }
 
-    /**
-     * 获取贴纸的绘制数据，用于保存图片
-     */
+    //获取贴纸的绘制数据，用于保存图片
     fun getDrawData(): StickerDrawData {
         return StickerDrawData(
             bitmap = stickerBitmap,

@@ -69,13 +69,6 @@ class PhotoAdapter(
 
     override fun getItemCount(): Int = photos.size
 
-    fun addPhoto(newPhoto: Photo) {
-        val newList = photos.toMutableList()
-        newList.add(newPhoto)
-        photos = newList
-        notifyItemInserted(photos.size - 1)
-    }
-
     fun updatePhotos(newPhotos: List<Photo>) {
         photos = newPhotos
         notifyDataSetChanged()

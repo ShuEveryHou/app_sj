@@ -92,9 +92,8 @@ class NewCropActivity : AppCompatActivity() {
         selectRatio(0f)
     }
 
-    /**
-     * 初始化所有视图组件
-     */
+
+    //初始化所有视图组件
     private fun initViews() {
         // 图片显示相关
         cropImageView = findViewById(R.id.cropImageView)
@@ -132,9 +131,8 @@ class NewCropActivity : AppCompatActivity() {
         btnFlipVertical = findViewById(R.id.btnFlipVertical)
     }
 
-    /**
-     * 加载图片数据
-     */
+
+    //加载图片数据，包括相机、用户和系统图片
     private fun loadImageData() {
         // 从Intent获取图片数据
         imagePath = intent.getStringExtra("photo_file_path")
@@ -171,9 +169,8 @@ class NewCropActivity : AppCompatActivity() {
         updateStatusText()
     }
 
-    /**
-     * 从文件解码Bitmap，使用采样避免内存过大
-     */
+
+    //从文件解码Bitmap，使用采样避免内存过大
     private fun decodeSampledBitmapFromFile(filePath: String, reqWidth: Int, reqHeight: Int): Bitmap? {
         val options = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
@@ -186,9 +183,8 @@ class NewCropActivity : AppCompatActivity() {
         return BitmapFactory.decodeFile(filePath, options)
     }
 
-    /**
-     * 从资源解码Bitmap，使用采样避免内存过大
-     */
+
+    //从资源解码Bitmap，使用采样避免内存过大
     private fun decodeSampledBitmapFromResource(resId: Int, reqWidth: Int, reqHeight: Int): Bitmap? {
         val options = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
@@ -201,9 +197,8 @@ class NewCropActivity : AppCompatActivity() {
         return BitmapFactory.decodeResource(resources, resId, options)
     }
 
-    /**
-     * 计算采样大小
-     */
+
+    //计算采样大小
     private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
         val height = options.outHeight
         val width = options.outWidth
@@ -221,9 +216,7 @@ class NewCropActivity : AppCompatActivity() {
         return inSampleSize
     }
 
-    /**
-     * 设置所有事件监听器
-     */
+    //设置所有事件监听器
     private fun setupListeners() {
         // 取消按钮
         btnCancel.setOnClickListener {
@@ -257,9 +250,7 @@ class NewCropActivity : AppCompatActivity() {
         setupRotateListeners()
     }
 
-    /**
-     * 设置裁剪比例按钮监听器
-     */
+    //设置裁剪比例按钮监听器
     private fun setupCropListeners() {
         val ratioButtons = listOf(
             Pair(btnFree, 0f),
@@ -277,9 +268,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 设置旋转按钮监听器（添加防抖处理）
-     */
+    //设置旋转按钮监听器（添加防抖处理）
     private fun setupRotateListeners() {
         // 顺时针旋转（防抖处理）
         btnRotateClockwise.setOnClickListener {
@@ -317,9 +306,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 切换到裁剪模式
-     */
+    //切换到裁剪模式
     private fun switchToCropMode() {
         isCropMode = true
         tvTitle.text = "编辑图片 - 裁剪"
@@ -340,9 +327,7 @@ class NewCropActivity : AppCompatActivity() {
         btnReset.visibility = View.VISIBLE
     }
 
-    /**
-     * 切换到旋转模式
-     */
+    //切换到旋转模式
     private fun switchToRotateMode() {
         isCropMode = false
         tvTitle.text = "编辑图片 - 旋转"
@@ -366,9 +351,7 @@ class NewCropActivity : AppCompatActivity() {
         updateStatusText()
     }
 
-    /**
-     * 更新标签颜色
-     */
+    //更新标签颜色
     private fun updateTabColors() {
         if (tabCrop.isSelected) {
             tabCrop.setTextColor(getColor(android.R.color.white))
@@ -379,9 +362,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 选择裁剪比例
-     */
+    //选择裁剪比例
     private fun selectRatio(ratio: Float) {
         val buttons = listOf(
             Pair(btnFree, 0f),
@@ -399,9 +380,7 @@ class NewCropActivity : AppCompatActivity() {
         cropOverlayView.setCropRatio(ratio)
     }
 
-    /**
-     * 顺时针旋转90°（安全版本）
-     */
+    //顺时针旋转90°
     private fun rotateClockwise90() {
         if (isTransforming) return
 
@@ -422,9 +401,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 逆时针旋转90°（安全版本）
-     */
+    //逆时针旋转90°
     private fun rotateCounterClockwise90() {
         if (isTransforming) return
 
@@ -444,9 +421,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 旋转180°（安全版本）
-     */
+    //旋转180°
     private fun rotate180() {
         if (isTransforming) return
 
@@ -466,9 +441,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 水平翻转（安全版本）
-     */
+    //水平翻转
     private fun flipHorizontal() {
         if (isTransforming) return
 
@@ -489,9 +462,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 垂直翻转（安全版本）
-     */
+    //垂直翻转
     private fun flipVertical() {
         if (isTransforming) return
 
@@ -512,9 +483,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 重置所有变换
-     */
+    //重置所有变换
     private fun resetAllTransformations() {
         if (isTransforming) return
 
@@ -536,9 +505,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 重置到原始状态
-     */
+    //重置到原始状态
     private fun resetToOriginal() {
         if (isCropMode) {
             // 裁剪模式：重置裁剪框
@@ -551,9 +518,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 更新状态文本
-     */
+    //更新状态文本
     private fun updateStatusText() {
         val rotationText = when (currentRotation) {
             0f -> "0°"
@@ -569,9 +534,7 @@ class NewCropActivity : AppCompatActivity() {
         tvRotateStatus.text = "状态: 旋转$rotationText | $horizontalText | $verticalText"
     }
 
-    /**
-     * 安全的应用变换（避免内存问题和并发问题）
-     */
+    //应用变换同时避免内存问题和并发问题
     private fun safeApplyTransformations() {
         if (originalBitmap == null) return
 
@@ -603,7 +566,7 @@ class NewCropActivity : AppCompatActivity() {
                 scaleY = -1f  // 垂直镜像
             }
 
-            // 注意：翻转需要在旋转之后应用，以达到正确的镜像效果
+            // 翻转需要在旋转之后应用，以达到正确的镜像效果
             if (scaleX != 1f || scaleY != 1f) {
                 transformMatrix.postScale(scaleX, scaleY)
             }
@@ -639,9 +602,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 更新图片显示
-     */
+    //更新图片显示
     private fun updateImageDisplay() {
         if (transformedBitmap != null && !transformedBitmap!!.isRecycled) {
             cropImageView.setImageBitmap(transformedBitmap)
@@ -649,9 +610,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 执行裁剪操作
-     */
+    //执行裁剪操作
     private fun performCrop() {
         if (transformedBitmap == null || transformedBitmap!!.isRecycled) {
             Toast.makeText(this, "图片未加载", Toast.LENGTH_SHORT).show()
@@ -695,9 +654,7 @@ class NewCropActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 应用裁剪到Bitmap
-     */
+    //应用裁剪到Bitmap
     private fun applyCrop(bitmap: Bitmap): Bitmap {
         val cropRect = cropOverlayView.getCropRect()
         val drawable = cropImageView.drawable ?: return bitmap
@@ -718,9 +675,7 @@ class NewCropActivity : AppCompatActivity() {
         )
     }
 
-    /**
-     * 获取图片显示区域
-     */
+    //获取图片显示区域
     private fun getImageDisplayRect(drawable: android.graphics.drawable.Drawable): RectF {
         val matrix = cropImageView.imageMatrix
 
@@ -734,9 +689,7 @@ class NewCropActivity : AppCompatActivity() {
         return bounds
     }
 
-    /**
-     * 转换裁剪框坐标
-     */
+    //转换裁剪框坐标
     private fun convertCropRectToImageCoordinates(
         cropRectInOverlay: RectF,
         imageRect: RectF,
@@ -760,9 +713,7 @@ class NewCropActivity : AppCompatActivity() {
         return cropRectInImage
     }
 
-    /**
-     * 保存图片到文件
-     */
+    //保存图片到文件
     private fun saveCroppedImage(bitmap: Bitmap): String? {
         return try {
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
@@ -783,25 +734,6 @@ class NewCropActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
             null
-        }
-    }
-
-    companion object {
-        /**
-         * 启动NewCropActivity的静态方法
-         */
-        fun startForResult(activity: AppCompatActivity, photo: Photo) {
-            val intent = Intent(activity, NewCropActivity::class.java).apply {
-                // 传递图片数据
-                putExtra("photo_id", photo.id)
-                putExtra("photo_resource_id", photo.resourceId)
-                putExtra("photo_file_path", photo.filePath)
-                putExtra("photo_title", photo.title)
-                putExtra("is_from_camera", photo.isFromCamera)
-                putExtra("is_user_created", photo.isUserCreated)
-            }
-
-            activity.startActivity(intent)
         }
     }
 

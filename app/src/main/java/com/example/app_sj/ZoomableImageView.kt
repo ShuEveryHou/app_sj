@@ -173,9 +173,7 @@ class ZoomableImageView @JvmOverloads constructor(
         return true
     }
 
-    /**
-     * 修正平移，确保图片不会移出边界
-     */
+    //平移，确保图片不会移出边界
     private fun fixTranslation() {
         val drawable = drawable ?: return
 
@@ -204,9 +202,7 @@ class ZoomableImageView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * 立即居中显示图片（无延迟）
-     */
+    //立即居中显示图片
     private fun centerImageImmediately() {
         val drawable = drawable ?: return
         val drawableWidth = drawable.intrinsicWidth.toFloat()
@@ -241,9 +237,7 @@ class ZoomableImageView @JvmOverloads constructor(
         imageMatrix = matrix
     }
 
-    /**
-     * 重置缩放和平移
-     */
+    //重置缩放和平移
     fun resetZoom() {
         centerImageImmediately()
     }

@@ -6,8 +6,8 @@ data class Photo(
     val resourceId: Int = 0,
     val filePath: String = "",
     val title: String = "",
-    val isFromCamera: Boolean = false,
-    val isUserCreated: Boolean = false // 新增：标记是否为用户创建的图片
+    val isFromCamera: Boolean = false,  //是否来着相机图片
+    val isUserCreated: Boolean = false //是否为用户创建的图片
 ) {
     fun getDisplayPath(): Any {
         return if (filePath.isNotEmpty()) {

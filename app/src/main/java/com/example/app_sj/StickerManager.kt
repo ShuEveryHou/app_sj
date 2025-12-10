@@ -5,9 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
-/**
- * 贴纸资源管理器
- */
+//贴纸资源管理器
 object StickerManager {
 
     // 贴纸类型枚举
@@ -27,9 +25,7 @@ object StickerManager {
         WOLF_,              // 灰狼
     }
 
-    /**
-     * 获取贴纸资源ID
-     */
+    //获取贴纸资源ID
     fun getStickerResource(type: StickerType): Int {
         return when (type) {
             StickerType.BLACK_CAT -> R.drawable.black_cat
@@ -48,9 +44,7 @@ object StickerManager {
         }
     }
 
-    /**
-     * 获取贴纸名称
-     */
+    //获取贴纸名称
     fun getStickerName(type: StickerType): String {
         return when (type) {
             StickerType.BLACK_CAT -> "黑猫"
@@ -69,16 +63,12 @@ object StickerManager {
         }
     }
 
-    /**
-     * 获取所有贴纸类型
-     */
+    //获取所有贴纸类型
     fun getAllStickerTypes(): List<StickerType> {
         return StickerType.values().toList()
     }
 
-    /**
-     * 加载贴纸Bitmap（带缩放）
-     */
+    //加载贴纸Bitmap，可缩放
     fun loadStickerBitmap(context: Context, type: StickerType, maxSize: Int = 200): Bitmap? {
         return try {
             val options = BitmapFactory.Options().apply {
